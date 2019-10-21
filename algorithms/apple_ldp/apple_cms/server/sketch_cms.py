@@ -1,0 +1,23 @@
+import math
+import numpy as np
+
+def sketch_cms(dataset,epsilon,k,m):
+    c = (math.pow(math.e, epsilon/2)+1)/(math.pow(math.e,epsilon/2)-1)
+    x = np.zeros((m, len(dataset)))
+
+    for i in range(0, len(dataset)):
+        v = np.array(dataset[i][0]) # Retrieve privatised vector
+        ones_vector = np.array([1]*m)
+        entry = k * ((c/2)*v + (1/2)*ones_vector)
+        x[:, i] = entry
+
+    M = np.zeros((k,m))
+
+    for i in range(0, len(dataset)):
+        for j in range(0,m):
+            hash_index = dataset[i][1]
+            # print("Hash Index: " + str(hash_index))
+            # print("J index: " + str(j))
+            # print("i index: " + str(i))
+            M[hash_index][j] = M[hash_index][j] + x[:, i][j]
+    return M
