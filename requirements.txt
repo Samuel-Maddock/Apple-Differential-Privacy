@@ -1,0 +1,5 @@
+xxhash
+matplotlib
+seaborn
+scipy
+numpy
