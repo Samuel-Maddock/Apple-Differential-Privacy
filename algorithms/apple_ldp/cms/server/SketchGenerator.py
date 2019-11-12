@@ -9,11 +9,9 @@ class SketchGenerator:
         self.m = m
         self.epsilon = epsilon
         self.c = (math.pow(math.e, epsilon / 2) + 1) / (math.pow(math.e, epsilon / 2) - 1)
-        self.transposed_hadamard = np.transpose(hadamard(self.m)) # Generate here to speed up sketch creation
 
     def create_cms_sketch(self, dataset):
         x = np.zeros((self.m, len(dataset)))
-
         print("Generating sketch vectors...")
         for i in range(0, len(dataset)):
             v = np.array(dataset[i][0])  # Retrieve privatised vector

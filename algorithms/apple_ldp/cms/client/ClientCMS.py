@@ -8,7 +8,9 @@ class ClientCMS:
         self.hash_funcs = hash_funcs
         self.k = len(hash_funcs)
         self.m = m
-        self.hadamard_matrix = hadamard(self.m) # Cache hadamard for performance
+
+        if (self.m & (self.m - 1)) == 0:
+            self.hadamard_matrix = hadamard(self.m) # Cache hadamard for performance
 
     def __privatise(self, data, is_hadamard=False):
         j = np.random.randint(0, self.k)
