@@ -1,6 +1,7 @@
 from sortedcontainers import SortedKeyList
 from operator import itemgetter
 
+
 class HeavyHitterList:
     def __init__(self, threshold):
         self.data = SortedKeyList(key=itemgetter(1))

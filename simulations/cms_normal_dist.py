@@ -58,6 +58,7 @@ axs[1].set_title("LDP CMS data produced from the normal sample \n $\epsilon=${},
 # Plotting both kde's from above for comparison
 sns.distplot(ldp_plot_data, hist=False, bins=bins, ax=axs[2], color='r')
 sns.distplot(data, bins=bins, hist=False, ax=axs[2])
+fig.tight_layout()
+plt.savefig("cms.png")
 plt.show()
-
 print("Plot Displayed !")

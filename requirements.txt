@@ -1,3 +1,4 @@
+sortedcontainers
 xxhash
 matplotlib
 seaborn
