@@ -9,7 +9,7 @@ import pandas as pd
 import seaborn as sns
 import itertools
 import string
-import  time
+import time
 
 # -------------------- Parameters for simulation --------------------
 
