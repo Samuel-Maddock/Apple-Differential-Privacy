@@ -1,3 +1,5 @@
+bitstring
+bitarray
 sortedcontainers
 xxhash
 matplotlib

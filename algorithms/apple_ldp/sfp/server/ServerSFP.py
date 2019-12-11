@@ -66,16 +66,18 @@ class ServerSFP:
 
         hash_table = defaultdict(lambda: defaultdict(list))
 
-        odd_numbers = np.arange(1, 10, step=2)
+        odd_numbers = np.arange(1, 6, step=2) # TODO: Hacky
         for l in odd_numbers:
             fragments, frequencies = zip(*frequency_dict.get(l).get_data())
             for fragment in fragments:
                 key,value = self.__split_fragment(fragment)
                 hash_table[key][l].append(value)
 
+        print(hash_table)
+
         for dictionary in hash_table.values():
             fragment_list = list(dictionary.values())
-            if len(fragment_list) == 5:
+            if len(fragment_list) == 3: # TODO: Hacky
                 D += list(map(lambda x: str().join(x), itertools.product(*fragment_list)))
 
         return D, freq_oracle

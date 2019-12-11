@@ -40,7 +40,7 @@ M = sketch_generator.create_hcms_sketch(ldp_data)  # Constructing the sketch mat
 server_cms = ServerCMS(M, hash_funcs)
 
 print("Estimating frequencies from sketch matrix...")
-ldp_freq = np.empty(len(bins))  # Stores estimated frequencies for each data point (
+ldp_freq = np.empty(len(bins))  # Stores estimated frequencies for each data point
 ldp_plot_data = np.empty(len(bins))  # Stores the actual data
 for key in bins:
     ldp_freq[key - 1] = server_cms.estimate_freq(key)
