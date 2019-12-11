@@ -10,7 +10,7 @@ The repo aims to implement the following:
 * Extensions to Google's RAPPOR for heavy-hitters: [Paper](https://arxiv.org/abs/1503.01214)
 * Implement two further LDP algorithms outlined in ["Practical Locally Private Heavy Hitters"](https://arxiv.org/abs/1707.04982)
 
-A good introduction and brief survey of recent LDP algorithms is presented [here](https://arxiv.org/abs/1707.04982).
+A good introduction and brief survey of recent LDP algorithms is presented [here](https://arxiv.org/abs/1907.11908).
 
 :warning: This repo currently is very much WIP and much of the code is undocumented :warning:
 
@@ -31,7 +31,7 @@ A good introduction and brief survey of recent LDP algorithms is presented [here
 - [ ] Misc: Finishing the README
 # Resources
 1) [Algorithmic Foundations of Differential Privacy](https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf)
-2) [Local Differential Privacy: a tutorial](https://arxiv.org/abs/1707.04982)
+2) [Local Differential Privacy: a tutorial](https://arxiv.org/abs/1907.11908)
 2) [Learning with Privacy at Scale by Apple](https://machinelearning.apple.com/docs/learning-with-privacy-at-scale/appledifferentialprivacysystem.pdf)
 3) [RAPPOR repo](https://www.github.com/google/rappor)
 4) [RAPPOR paper](http://arxiv.org/abs/1407.6981)
