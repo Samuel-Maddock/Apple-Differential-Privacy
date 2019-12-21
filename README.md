@@ -22,8 +22,10 @@ A good introduction and brief survey of recent LDP algorithms is presented [here
 - [ ] Google: Implement RAPPOR's server-side algorithm (based on code [here](https://github.com/google/rappor/tree/master/analysis/R))
 - [ ] Google: Implement the RAPPOR extension
 - [ ] Google: Simulations for RAPPOR + extensions
-- [ ] BNST: Implement TreeHistogram (based on code [here](https://bitbucket.org/abhradt/locallyprivatehistogram/src/master/))
-- [ ] BNST: Implement the Bitstogram algorithm
+- [x] BNST: Implement TreeHistogram (based on code [here](https://bitbucket.org/abhradt/locallyprivatehistogram/src/master/))
+- [x] BNST: Implement the Simple Bitstogram Protocol (ExplicitHist + SuccinctHist)
+- [x] BNST: Implement the Full Bitstogram Protocol without error correcting codes
+- [ ] BNST: Add error correcting codes to the Bitstogram algorithm
 - [ ] BNST: Simulations for TreeHistogram and Bitstogram
 - [ ] Misc: Documentation !!!
 - [ ] Misc: Modularisation to support combining algorithms

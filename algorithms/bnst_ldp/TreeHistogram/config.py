@@ -62,7 +62,7 @@ class config:
         numBits = int(math.floor(math.log(num, 2)) + 1)
         return 2**numBits
 
-    epsilon = 2.0    # Privacy parameter, to be set globally
+    epsilon = 1.0    # Privacy parameter, to be set globally
     cEpsilon = (math.exp(epsilon) + 1)/(math.exp(epsilon) - 1)  # Scaling for de-biasing
 
     p = 10000000     # Domain size
@@ -76,7 +76,7 @@ class config:
     numNgrams = 3
     gramLength = 2  # Gram length
     emptyChar = '?'  # Character to fill the word with if words are smaller
-    threshold = 9.5 * int(math.sqrt(n)) # Threshold for discoverability
+    threshold = 15 * int(math.sqrt(n)) # Threshold for discoverability
 
     numOfRunsPerDataFile = 1    # Number of experiments to run per file
 

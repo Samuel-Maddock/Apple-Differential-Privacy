@@ -2,15 +2,12 @@ from algorithms.apple_ldp.sfp.client.ClientSFP import ClientSFP
 from algorithms.apple_ldp.sfp.server.ServerSFP import ServerSFP
 from algorithms.apple_ldp.cms.CMSHelper import cms_helper
 from algorithms.apple_ldp.sfp.HeavyHitterList import HeavyHitterList
-from algorithms.bnst_ldp.TreeHistogram.ServerSide import runServerSideWordDiscovery
 
 from collections import Counter
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
 import seaborn as sns
 import itertools
-import string
 import time
 
 # -------------------- Parameters for simulation --------------------
@@ -86,19 +83,12 @@ for i in range(0, len(D)):
 
 print("Server Side SFP was calculated in: " + str(time.time()-start_time) + " seconds")
 
-# -------------------- Simulating the TreeHistogram Algorithm --------------------
-
-data = pd.DataFrame(list(dict(Counter(dataset)).items()), columns=["word", "trueFrequency"])
-
-wordFreq = runServerSideWordDiscovery(data, "exp1", "results")
-
 # -------------------- Plotting the data --------------------
 print("Plotting results...")
 
-fig, axs = plt.subplots(3, figsize=(8,8))
+fig, axs = plt.subplots(2, figsize=(8,8))
 ax1 = axs[0]
 ax2 = axs[1]
-ax3 = axs[2]
 
 color_palette = sns.cubehelix_palette(10, start=.5, rot=-.75, reverse=True)
 
@@ -130,23 +120,6 @@ ax2.tick_params(rotation=45)
 ax2.set_xlabel("Words Discovered")
 ax2.set_ylabel("Estimated Word Count")
 ax2.set_title("Discovered words and their estimated frequencies \n Using SFP(($\epsilon, \epsilon^\prime$) = {},{}, ($m,m^\prime$) = {},{}, ($k,k^\prime$)={},{})".format(epsilon, epsilon_prime,m,m,k,k))
-
-# Plotting Tree Histogram Results
-
-x3, y3 = list(wordFreq.keys()), list(wordFreq.values())
-
-palette = []
-for data in list(x3):
-    if data not in list(x1):
-        palette.append("#e74c3c")
-    else:
-        palette.append(color_palette[(x1).index(data)])
-
-sns.barplot(x3, y3, ax=ax3, palette=palette)
-ax3.tick_params(rotation=45)
-ax3.set_xlabel("Words Discovered")
-ax3.set_ylabel("Estimated Word Count")
-ax3.set_title("Discovered words and their estimated frequencies \n Using TreeHistogram")
 
 fig.tight_layout()
 

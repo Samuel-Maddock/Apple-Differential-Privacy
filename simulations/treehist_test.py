@@ -29,7 +29,7 @@ word_sample_size = 10
 # We then sample from this randomly to choose word_sample_size words
 # We then use these words to sample our data from
 
-print("SFP Word Count Simulation...")
+print("TreeHist Word Count Simulation...")
 start_time = time.time()
 
 alphabet_list = []
@@ -47,6 +47,12 @@ def generate_words(n):
 
 words = generate_words(word_sample_size)
 
+data1 = ["abcaac"] * 10000
+data2 = ["cccbba"] * 8000
+data3 = ["aabbcc"] * 300
+
+data = np.concatenate((data1,data2,data3))
+
 print("Test data generated in: " + str(time.time()-start_time) + " seconds")
 start_time = time.time()
 
@@ -58,8 +64,12 @@ for i in range(0, N):
     word = np.random.choice(words)  # Sample randomly from our generated words
     dataset.append(word)  # Add the word to our dataset
 
+
+dataset = data
+
 data = pd.DataFrame(list(dict(Counter(dataset)).items()), columns=["word", "trueFrequency"])
 
 wordFreq = runServerSideWordDiscovery(data, "exp1", "results")
 
+print(data)
 print(wordFreq)

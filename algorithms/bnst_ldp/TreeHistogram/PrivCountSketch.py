@@ -60,8 +60,8 @@ class countSketch:
             hLoc = BitArray(messageInBitArray[0: int(math.log(config.w, 2))]).uint
             gVal = 2 * messageInBitArray[int(math.log(config.w, 2))] - 1
             weakFreqEstimates[hashId] = gVal * countSketch.sketchMatrix[hashId, hLoc]
-        estimate = np.median(weakFreqEstimates)
-        return estimate if estimate >0 else 0
+        estimate = np.mean(weakFreqEstimates)
+        return estimate
 
 
 

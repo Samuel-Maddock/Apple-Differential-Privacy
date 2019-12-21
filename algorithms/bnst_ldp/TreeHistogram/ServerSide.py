@@ -146,4 +146,7 @@ def runServerSideWordDiscovery(wordFrequency, configFileName, exptResultFile, fi
     wordFrequency.to_csv(config.dataPath + filePrefix + exptResultFile, sep=',')
     presRecDF.to_csv(config.dataPath + filePrefix + precisionRecallMetricFileName, sep=',')
 
+    for word in noisyFrequencies.keys():
+        print(privCountSketch.getFreqEstimate(word))
+
     return noisyFrequencies
