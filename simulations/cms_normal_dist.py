@@ -73,12 +73,15 @@ print("Plotting data...")
 # Plotting a distplot of our integer data sampled from a normal dist
 sns.distplot(data, bins=bins, ax=axs[0], hist_kws={'ec': "black"})
 axs[0].set_title("Count Mean Sketch (CMS) \n Integer data sampled from a Normal distribution \n $N=${}, Sampled from $N({}, {})$".format(N, mu, sd*sd))
+
 # Plotting a distplot of the data produced from the CMS algorithm
 sns.distplot(ldp_plot_data, bins=bins, ax=axs[1], color='r', hist_kws={'ec': "black"})
 axs[1].set_title("LDP CMS data produced from the normal sample \n $\epsilon=${}, $m=${}, $k=${}".format(epsilon, m, k))
+
 # Plotting both kde's from above for comparison
 sns.distplot(ldp_plot_data, hist=False, bins=bins, ax=axs[2], color='r')
 sns.distplot(data, bins=bins, hist=False, ax=axs[2])
+
 fig.tight_layout()
 plt.savefig("cms.png")
 plt.show()

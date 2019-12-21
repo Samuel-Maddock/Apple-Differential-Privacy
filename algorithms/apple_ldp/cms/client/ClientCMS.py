@@ -27,7 +27,7 @@ class ClientCMS:
 
     def client_hcms(self, data):
         if not (self.m & (self.m - 1)) == 0:
-            raise ValueError("m must be an positive integer, and m must b a power of 2 to use hcms")
+            raise ValueError("m must be a positive integer, and m must be a power of 2 to use hcms")
 
         v,b,j = self.__privatise(data, is_hadamard=True)
         w = self.hadamard_matrix.dot(v) # Hadamard transform H_m.v
