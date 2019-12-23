@@ -22,8 +22,9 @@ source.rappor <- function(rel_path)  {
   source(abs_path)
 }
 
-source.rappor("analysis/R/util.R")  # for Log
-
+library("here")
+dir <- trimws(here("algorithms", "google_ldp", "rappor", "server"))
+source(paste0(dir, "/analysis/R/util.R"))
 
 ReadParameterFile <- function(params_file) {
   # Read parameter file. Format:

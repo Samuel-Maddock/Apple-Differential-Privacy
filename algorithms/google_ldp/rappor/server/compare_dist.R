@@ -47,11 +47,14 @@ if (library(Cairo, quietly = TRUE, logical.return = TRUE)) {
   cat('Using png\n')
 }
 
-source("analysis/R/read_input.R")
-source("analysis/R/decode.R")
-source("analysis/R/util.R")
+# TODO: There has gotta be a nicer way to source these files...
+library(here)
+dir <- trimws(here("algorithms", "google_ldp", "rappor", "server"))
+source(paste0(dir, "/analysis/R/util.R"))
+source(paste0(dir, "/analysis/R/read_input.R"))
+source(paste0(dir, "/analysis/R/decode.R"))
 
-source("analysis/R/alternative.R")  # temporary
+source(paste0(dir, "/analysis/R/alternative.R"))  # temporary
 
 LoadContext <- function(prefix_case) {
   # Creates the context, filling it with privacy parameters

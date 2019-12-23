@@ -314,13 +314,11 @@ class Encoder(object):
     """
         bloom_bits = get_bloom_bits(word, self.cohort, self.params.num_hashes,
                                     self.params.num_bloombits)
-        print(bloom_bits)
         bloom = 0
         for bit_to_set in bloom_bits:
             bloom |= (1 << bit_to_set)
 
         prr, irr = self._internal_encode_bits(bloom)
-        print(prr)
         return bloom, prr, irr
 
     def encode_bits(self, bits):

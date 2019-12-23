@@ -18,8 +18,8 @@ A good introduction and brief survey of recent LDP algorithms is presented [here
 - [x] Apple: Implement Count-Mean-Sketch (CMS) and Hadamard Count-Mean-Sketch
 - [x] Apple: Implement the Sequence Fragment Puzzle (SFP) Algorithm
 - [x] Apple: Basic simulations for CMS, HCMS, SFP 
-- [ ] Google: Port over RAPPOR client-side from the RAPPOR repo (based on code [here](https://github.com/google/rappor/blob/master/client/python/rappor.py))
-- [ ] Google: Implement RAPPOR's server-side algorithm (based on code [here](https://github.com/google/rappor/tree/master/analysis/R))
+- [x] Google: Port over RAPPOR client-side from the RAPPOR repo (based on code [here](https://github.com/google/rappor/blob/master/client/python/rappor.py))
+- [x] Google: Implement RAPPOR's server-side algorithm (based on code [here](https://github.com/google/rappor/tree/master/analysis/R))
 - [ ] Google: Implement the RAPPOR extension
 - [ ] Google: Simulations for RAPPOR + extensions
 - [x] BNST: Implement TreeHistogram (based on code [here](https://bitbucket.org/abhradt/locallyprivatehistogram/src/master/))

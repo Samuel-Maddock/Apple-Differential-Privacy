@@ -2,14 +2,18 @@ from algorithms.google_ldp.rappor.client.RAPPORClient import RAPPORClient
 from algorithms.google_ldp.rappor.client.rappor import Params, bit_string, get_bloom_bits
 import pandas as pd
 import subprocess
-import csv, sys
+import csv, sys, os
 
 class RAPPORServer:
     def __init__(self, num_bloombits, num_hashes, num_of_cohorts, probabilities):
         self.params = Params(num_bloombits, num_hashes, num_of_cohorts, probabilities)
         self.reports = []
-        self.analysis_input_path = "./analysis_input/"
-        self.analysis_output_path = "./analysis_output"
+        self.analysis_input_path = "_RAPPOR/analysis_input/"
+        self.analysis_output_path = "_RAPPOR/analysis_output"
+        self.dir_path = os.path.dirname(os.path.realpath(__file__))
+
+        os.makedirs(self.analysis_output_path, exist_ok=True)
+        os.makedirs(self.analysis_input_path, exist_ok=True)
 
     def init_client_instance(self, cohort):
         return RAPPORClient(cohort, self.params)
@@ -21,7 +25,7 @@ class RAPPORServer:
         self.reports = []
 
     def _write_params(self):
-        with open('./analysis_input/_params.csv', 'w', newline='') as f:
+        with open(self.analysis_input_path + '_params.csv', 'w', newline='') as f:
             writer = csv.writer(f)
             row1 = ["k", "h", "m", "p", "q", "f"]
             row2 = []
@@ -33,7 +37,7 @@ class RAPPORServer:
             writer.writerow(row2)
 
     def _write_counts(self):
-        with open('./analysis_input/_counts.csv', 'w', newline='') as f:
+        with open(self.analysis_input_path + '_counts.csv', 'w', newline='') as f:
           writer = csv.writer(f)
           num_cohorts = self.params.num_cohorts
           num_bloombits = self.params.num_bloombits
@@ -41,9 +45,10 @@ class RAPPORServer:
           sums = [[0] * num_bloombits for _ in range(num_cohorts)]
           num_reports = [0] * num_cohorts
 
-          for i, report in self.reports:
+          for i, report in enumerate(self.reports):
             (irr, cohort) = report
             cohort = int(cohort)
+            irr = bit_string(irr, num_bloombits)
             num_reports[cohort] += 1
 
             if not len(irr) == num_bloombits:
@@ -63,7 +68,7 @@ class RAPPORServer:
             writer.writerow(row)
 
     def _write_map(self, items):
-        with open('./analysis_input/_map.csv', 'w', newline='') as f:
+        with open(self.analysis_input_path + '_map.csv', 'w', newline='') as f:
             num_bloombits = self.params.num_bloombits
             num_hashes = self.params.num_hashes
             num_cohorts = self.params.num_cohorts
@@ -88,7 +93,7 @@ class RAPPORServer:
         self._write_counts()
         self._write_map(candidate_strings)
 
-        subprocess.call(["Rscript",  "compare_dist.R", self.analysis_input_path, self.analysis_input_path, self.analysis_output_path])
+        subprocess.call(["Rscript",  self.dir_path + "/compare_dist.R", self.analysis_input_path, self.analysis_input_path, self.analysis_output_path])
 
-        freq_hist = pd.read_csv("./analysis_output/metrics.csv")
+        freq_hist = pd.read_csv(self.analysis_output_path + "/metrics.csv")
         return freq_hist

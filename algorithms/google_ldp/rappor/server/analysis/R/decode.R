@@ -23,7 +23,9 @@ source.rappor <- function(rel_path)  {
   source(abs_path)
 }
 
-source.rappor('analysis/R/alternative.R')
+library("here")
+dir <- trimws(here("algorithms", "google_ldp", "rappor", "server"))
+source(paste0(dir, "/analysis/R/alternative.R"))
 
 EstimateBloomCounts <- function(params, obs_counts) {
   # Estimates the number of times each bit in each cohort was set in original
