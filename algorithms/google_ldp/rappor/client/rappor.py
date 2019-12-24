@@ -34,6 +34,8 @@ import hmac
 import json
 import struct
 import sys
+import os
+from algorithms.google_ldp.rappor.client.hmacDRBG import HMAC_DRBG
 from bitstring import BitArray
 
 from random import SystemRandom
@@ -193,26 +195,32 @@ def get_bloom_bits(word, cohort, num_hashes, num_bloombits):
     if num_hashes > len(digest):
         raise RuntimeError("Can't have more than %d hashes" % md5)
 
-    # log('hash_input %r', value)
-    # log('Cohort %d', cohort)
-    # log('MD5 %s', md5.hexdigest())
-
     return [digest[i] % num_bloombits for i in range(num_hashes)]
 
 
 def get_prr_masks(secret, word, prob_f, num_bits):
     h = hmac.new(secret, word, digestmod=hashlib.sha256)
-    # log('word %s, secret %s, HMAC-SHA256 %s', word, secret, h.hexdigest())
 
-    # Now go through each byte
-    digest_bytes = h.digest()
-    assert len(digest_bytes) == 32
+    hmac_drbg = HMAC_DRBG(entropy=os.urandom(64), personalization_string=secret)
+    digest_bytes = hmac_drbg.generate(256)
+
+    # # Now go through each byte
+    # digest_bytes = h.digest()
+    # assert len(digest_bytes) == 32
+    #
+    # # TODO: We just generate 256 bits using the repeated HMAC look into this and using HMAC-DRBG
+    # b = BitArray(auto=digest_bytes)
+    #
+    # for i in range(0,8):
+    #     b.append(digest_bytes)
+    #
+    # digest_bytes = b.tobytes()
 
     # Use 32 bits.  If we want 64 bits, it may be fine to generate another 32
     # bytes by repeated HMAC.  For arbitrary numbers of bytes it's probably
     # better to use the HMAC-DRBG algorithm.
     if num_bits > len(digest_bytes):
-        raise RuntimeError('%d bits is more than the max of %d', num_bits, len(d))
+        raise RuntimeError('%d bits is more than the max of %d', num_bits, len(digest_bytes))
 
     threshold128 = prob_f * 128
 
@@ -260,7 +268,7 @@ class Encoder(object):
         # irr_rand.
         self.params = params
         self.cohort = cohort  # associated: MD5
-        self.secret = bytes(secret, "utf-8")  # associated: HMAC-SHA256
+        self.secret = secret  # secret should be in bytes associated: HMAC-SHA256
         self.irr_rand = irr_rand  # p and q used
 
     def _internal_encode_bits(self, bits):
@@ -269,8 +277,10 @@ class Encoder(object):
       The PRR and IRR.  The PRR should never be sent over the network.
     """
         # Compute Permanent Randomized Response (PRR).
+        bits_as_bytes = BitArray(uint=bits, length=self.params.num_bloombits).tobytes()
+
         uniform, f_mask = get_prr_masks(
-            self.secret, to_big_endian(bits), self.params.prob_f,
+            self.secret, bits_as_bytes, self.params.prob_f,
             self.params.num_bloombits)
 
         # Suppose bit i of the Bloom filter is B_i.  Then bit i of the PRR is
@@ -289,12 +299,6 @@ class Encoder(object):
         # - The remaining bits are 0, with remaining probability f/2.
 
         prr = (bits & ~f_mask) | (uniform & f_mask)
-
-        # log('U %s / F %s', bit_string(uniform, num_bits),
-        #    bit_string(f_mask, num_bits))
-
-        # log('B %s / PRR %s', bit_string(bloom_bits, num_bits),
-        #    bit_string(prr, num_bits))
 
         # Compute Instantaneous Randomized Response (IRR).
         # If PRR bit is 0, IRR bit is 1 with probability p.
