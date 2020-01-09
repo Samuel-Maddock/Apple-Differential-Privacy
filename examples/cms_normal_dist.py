@@ -7,6 +7,10 @@ from algorithms.apple_ldp.cms.server.ServerCMS import ServerCMS
 from algorithms.apple_ldp.cms.CMSHelper import cms_helper
 from collections import Counter
 
+# This is an example file showing you how to use the CMS algorithm
+# For actual plot generation/simulation usage, you should use the CMSSimulation.py
+    # CMSSimulation.py wraps the logic in this file in a cleaner to use class
+
 # -------------------- Parameters for simulation --------------------
 m = 2048
 k = 1024
