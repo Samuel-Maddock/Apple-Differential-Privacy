@@ -13,11 +13,12 @@ import math
 
 
 class PrivateCountSketch:
-    def __init__(self, l, w, epsilon):
+    def __init__(self, l, w, epsilon, use_median=False):
         self.l = l
         self.w = w
         self.epsilon = epsilon
         self.sketch_matrix = np.zeros((l, w))
+        self.use_median = use_median
 
     @staticmethod
     def get_sha256_hash_arr(hashId, dataString):
@@ -65,5 +66,7 @@ class PrivateCountSketch:
             g_val = 2 * message_in_bit_array[int(math.log(self.w, 2))] - 1
             weak_freq_estimates[hashId] = g_val * self.sketch_matrix[hashId, h_loc]
 
-        estimate = np.mean(weak_freq_estimates)
-        return estimate
+        if self.use_median:
+            return np.median(weak_freq_estimates)
+        else:
+            return np.mean(weak_freq_estimates)

@@ -5,16 +5,17 @@ from collections import Counter
 
 
 class PCSSimulation:
-    def __init__(self, params):
+    def __init__(self, params, use_median=False):
         self.l = params["l"]
         self.w = params["w"]
         self.epsilon = params["epsilon"]
+        self.use_median = use_median
 
     def run(self, data, domain):
         # -------------------- Simulating the client-side process --------------------
         ldp_data = []
 
-        priv_count_sketch = PrivateCountSketch(self.l, self.w, self.epsilon)
+        priv_count_sketch = PrivateCountSketch(self.l, self.w, self.epsilon, use_median=self.use_median)
 
         print("Sampling data from the clients...")
         for i in range(0, len(data)):

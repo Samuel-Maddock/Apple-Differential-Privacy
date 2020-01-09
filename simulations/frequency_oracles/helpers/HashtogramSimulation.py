@@ -6,17 +6,18 @@ from collections import Counter
 
 
 class HashtogramSimulation:
-    def __init__(self, params):
+    def __init__(self, params, use_median=False):
         self.T = params["T"]
         self.R = params["R"]
         self.epsilon = params["epsilon"]
+        self.use_median = use_median
 
     def run(self, data, domain):
         # -------------------- Simulating the client-side process --------------------
         ldp_data = []
         hash_funcs = cms_helper.generate_hash_funcs(self.R, self.T)
 
-        hashtogram = Hashtogram(data, hash_funcs, self.T, self.epsilon)
+        hashtogram = Hashtogram(data, hash_funcs, self.T, self.epsilon, use_median=self.use_median)
 
         # -------------------- Simulating the server-side process --------------------
         print("Estimating frequencies...")

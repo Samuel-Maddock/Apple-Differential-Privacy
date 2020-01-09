@@ -34,8 +34,10 @@ class NormalDistSimulation:
             "hcms": lambda parameters: CMSSimulation(parameters, is_hcms=True),
             "rappor": lambda parameters: RAPPORSimulation(parameters),
             "priv_count_sketch": lambda parameters: PCSSimulation(parameters),
+            "priv_count_sketch_median": lambda parameters: PCSSimulation(parameters, use_median=True),
             "explicit_hist": lambda parameters: ExplicitHistSimulation(parameters),
-            "hashtogram": lambda parameters: HashtogramSimulation(parameters)
+            "hashtogram": lambda parameters: HashtogramSimulation(parameters),
+            "hashtogram_median": lambda parameters: HashtogramSimulation(parameters, use_median=True)
         }
 
         return freq_oracles.get(experiment_name, "error")(params).run(self.data, self.bins) # TODO: Provide error handling

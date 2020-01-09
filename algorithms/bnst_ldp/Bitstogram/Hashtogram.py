@@ -8,7 +8,7 @@ from collections import Counter
 # Any set [n] = {1,...,n} is represented here as {0,....,n-1} for ease of indexing
 
 class Hashtogram:
-    def __init__(self, dataset, hash_family, T, epsilon):
+    def __init__(self, dataset, hash_family, T, epsilon, use_median=False):
         self.epsilon = epsilon
         self.prob = 1 / ((math.e ** epsilon) + 1)
         self.n = len(dataset)
@@ -16,6 +16,7 @@ class Hashtogram:
         self.R = len(hash_family)
         self.hash_family = hash_family
         self.partition = self.__generate_partition(self.n)
+        self.use_median = use_median
 
         # Constructing randomised dataset (Step 1 of algorithm 7)
         self.y = [0] * self.n
@@ -60,5 +61,8 @@ class Hashtogram:
 
             frequency_estimates[i] = self.__freq_partition_estimate(i, hashed_data)
 
-        return self.R * np.mean(frequency_estimates)
-
+        # BNST Paper uses median for Hashtogram, mean seems to give better results.
+        if self.use_median:
+            return self.R * np.median(frequency_estimates)
+        else:
+            return self.R * np.mean(frequency_estimates)
