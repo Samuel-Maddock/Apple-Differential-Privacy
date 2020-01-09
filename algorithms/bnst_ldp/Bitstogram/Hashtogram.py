@@ -27,7 +27,7 @@ class Hashtogram:
                 if j in partition:
                     r = i
 
-            self.y[j] = self.__basic_randomiser(self.Z[self.hash_family[r](dataset[j]), j])
+            self.y[j] = self.__basic_randomiser(self.Z[self.hash_family[r](str(dataset[j])), j])
 
     # Algorithm 4
     def __basic_randomiser(self, x):
@@ -56,7 +56,7 @@ class Hashtogram:
         frequency_estimates = [0] * self.R
 
         for i in range(0, self.R):
-            hashed_data = self.hash_family[i](v)
+            hashed_data = self.hash_family[i](str(v))
 
             frequency_estimates[i] = self.__freq_partition_estimate(i, hashed_data)
 
@@ -64,27 +64,4 @@ class Hashtogram:
 
     def unravel(self):
         return self.y, self.Z, self.partition
-
-# N = 10000
-# mu = 10
-# sd = 3
-#
-# data = np.random.normal(mu,sd,N).astype(int)
-# hash_funcs = cms_helper.generate_hash_funcs(100, 100)
-# hashtogram = Hashtogram(data, hash_funcs, 100, 4)
-# original_freq_data = dict(Counter(data.tolist()))
-#
-# y, Z, partition = hashtogram.unravel()
-#
-# hash_dict = {}
-# for key in original_freq_data.keys():
-#     hash_dict[key] = hashtogram.freq_oracle(str(key))
-#
-# for w in sorted(original_freq_data, key=original_freq_data.get, reverse=True):
-#   print(w, original_freq_data[w])
-#
-# print("HASHTOGRAM ESTIMATION")
-#
-# for w in sorted(hash_dict, key=hash_dict.get, reverse=True):
-#   print(w, hash_dict[w])
 

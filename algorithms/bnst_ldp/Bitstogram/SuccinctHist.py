@@ -45,6 +45,10 @@ class SuccintHist:
         return np.array_split(p, self.binary_domain_size)
 
     def __index_mapper(self, tup):
+        # For our threshold T we create an ExplicitHist of length 2T and depending on the coordinate we
+            # store the randomised value in either (k, "0") which corresponds to the key k
+            # or (k, "1") which is indexed by k + T
+
         if tup[1] == "0":
             return tup[0]
         else:

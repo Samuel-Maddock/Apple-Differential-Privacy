@@ -27,7 +27,7 @@ class countSketch:
     def setSketchElement(dataString):
         assert (isinstance(dataString, str) == True), 'Data should be a string'
 
-        hashId = np.random.randint(0,config.l)
+        hashId = np.random.randint(0, config.l)
         messageInBitArray = countSketch.getSHA256HashArray(hashId, dataString)
 
         hLoc = BitArray(messageInBitArray[0: int(math.log(config.w, 2))]).uint
@@ -38,8 +38,7 @@ class countSketch:
 
         privatizedVec = randomize(dataVec)
 
-        countSketch.sketchMatrix[hashId]+= (privatizedVec * config.cEpsilon * config.l)
-
+        countSketch.sketchMatrix[hashId] += (privatizedVec * config.cEpsilon * config.l)
 
     @staticmethod
     def writeSketchToFile(sketchLocation):
@@ -62,16 +61,3 @@ class countSketch:
             weakFreqEstimates[hashId] = gVal * countSketch.sketchMatrix[hashId, hLoc]
         estimate = np.mean(weakFreqEstimates)
         return estimate
-
-
-
-
-
-
-
-
-
-
-
-
-
