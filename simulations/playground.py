@@ -36,8 +36,8 @@ T =  100
 
 normal_simulation = NormalDistSimulation(N, mu, sd)
 
-params = {"m": m, "k": k, "epsilon": epsilon}
-params2 = {"l": l, "w": w, "epsilon": epsilon}
+cms = {"m": m, "k": k, "epsilon": epsilon}
+priv_count_sketch = {"l": l, "w": w, "epsilon": epsilon}
 explicit_hist = {"epsilon": epsilon}
 hashtogram = {"epsilon": epsilon, "R": R, "T": R}
 
@@ -50,4 +50,4 @@ rappor = {
     "prob_f": prob_f
 }
 
-normal_simulation.run_and_plot([("cms", params), ("rappor", rappor)])
+normal_simulation.run_and_plot([("cms", cms), ("hcms", cms), ("priv_count_sketch", priv_count_sketch), ("explicit_hist", explicit_hist), ("hashtogram", hashtogram), ("rappor", rappor)])

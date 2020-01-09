@@ -20,8 +20,7 @@ class NormalDistSimulation:
         self.experiment_plot_data = []
 
     def _run(self, experiment_list):
-        # TODO: For now we only compare two experiments -> Support for more maybe later?
-        for i in range(0, 2):
+        for i in range(0, len(experiment_list)):
             experiment_name = experiment_list[i][0]
             params = experiment_list[i][1]
 
@@ -39,11 +38,14 @@ class NormalDistSimulation:
             "hashtogram": lambda parameters: HashtogramSimulation(parameters)
         }
 
-        return freq_oracles.get(experiment_name, "cms")(params).run(self.data, self.bins)
+        return freq_oracles.get(experiment_name, "error")(params).run(self.data, self.bins) # TODO: Provide error handling
 
     def _plot(self):
         bins = np.arange(start=min(self.data), stop=max(self.data) + 1)
-        fig, axs = plt.subplots(len(self.experiment_plot_data) + 2)
+
+        figsize = (len(self.experiment_plot_data)*5, len(self.experiment_plot_data)*5)
+
+        fig, axs = plt.subplots(len(self.experiment_plot_data) + 2, figsize=figsize)
         colours = sns.color_palette("hls", len(self.experiment_plot_data) + 1) # Generate colours for each plot
 
         # Plotting a distplot of our integer data sampled from a normal dist

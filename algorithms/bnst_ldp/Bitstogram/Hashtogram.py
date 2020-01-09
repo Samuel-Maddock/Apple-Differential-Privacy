@@ -62,6 +62,3 @@ class Hashtogram:
 
         return self.R * np.mean(frequency_estimates)
 
-    def unravel(self):
-        return self.y, self.Z, self.partition
-
