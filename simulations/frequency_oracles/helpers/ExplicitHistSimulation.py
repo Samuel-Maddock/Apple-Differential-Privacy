@@ -15,7 +15,7 @@ class ExplicitHistSimulation:
 
         # ExplicitHist privatises strings, so this ensure the index_mapper correctly maps domain values to indexes
             # The ExplicitHist class auto casts data/domain elements to strings so we don't need to do that here
-        index_map = lambda x: list(map(str, domain)).index(x) # Index map for indexing hist -> Look at ExplicitHist.py for more info
+        index_map = lambda x: list(map(str, domain)).index(str(x)) # Index map for indexing hist -> Look at ExplicitHist.py for more info
 
         hist = ExplicitHist(data, len(domain), self.epsilon, index_map=index_map)
         # -------------------- Simulating the server-side process --------------------
