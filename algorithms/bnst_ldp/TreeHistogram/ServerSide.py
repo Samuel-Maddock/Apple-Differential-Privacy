@@ -1,152 +1,159 @@
 # Server side component of Count sketch, contains distribution and aggregation logic
-from .config import config
 import pandas as pd
 import numpy as np
-from .PrivCountSketch import countSketch as privCountSketch
+import math
 import uuid
+
+from algorithms.bnst_ldp.TreeHistogram.PrivateCountSketch import PrivateCountSketch
 from collections import deque
 
-# wordFrequency: The data file as a dataframe with the two columns ['word', 'trueFrequency']
-# configFileName: File to dump the configuration parameters. Include expt info in the filename
-# expResultFile: File to dump the experiment results as a .csv file
 
-def runServerSide(wordFrequency, configFileName, exptResultFile, filePrefix=''):
-    config.dumpConfig(filePrefix + configFileName)
+class TreeHistogram():
+    def __init__(self, l, w, epsilon, num_n_grams, gram_length, threshold):
+        self.l = l
+        self.w = w
+        self.epsilon = epsilon
+        self.num_n_grams = num_n_grams  # Number of N-grams
+        self.gram_length = gram_length  # Gram length
+        self.threshold = threshold
+        self.empty_char = "?"
 
-    for run in range(config.numOfRunsPerDataFile):
-        print('Running for iteration = ', run)
+    def checkArrayCounterMaxReached(self, arrayOfCounters):
+        if arrayOfCounters[0] == 3:
+            return True
+        return False
+
+    def incrementArray(self, arrayOfCounters):
+        arrayOfCounters[-1] += 1
+        for i in range(len(arrayOfCounters) - 1, 0, -1):
+            if arrayOfCounters[i] == 3:
+                arrayOfCounters[i] = 0
+                arrayOfCounters[i - 1] += 1
+
+    def _choose_random_n_gram_prefix(self, word, N):
+        assert len(word) % N == 0, 'Word = ' + word + ' is not of correct length'
+        random_start_index = np.random.randint(0, len(word) / N) * N
+        random_prefix_word = word[0:random_start_index + N] + self.empty_char * (
+                    self.gram_length * self.num_n_grams - len(word[0:random_start_index + N]))
+        return random_prefix_word
+
+    def _gen_english_n_grams(self, N):
+        gram_dict = [''] * (int(math.pow(3, N)))
         counter = 0
-        privCountSketch.sketchMatrix = np.zeros((config.l, config.w))
-        for index, row in wordFrequency.iterrows():
+        word_length = self.gram_length
+        array_of_counters = [0] * word_length
+        while(self.checkArrayCounterMaxReached(array_of_counters) == False):
+            for x in array_of_counters:
+                gram_dict[counter] += chr(97 + x)
+            counter += 1
+            self.incrementArray(array_of_counters)
+        return gram_dict
+
+    # wordFrequency: The data file as a dataframe with the two columns ['word', 'trueFrequency']
+    # configFileName: File to dump the configuration parameters. Include expt info in the filename
+    # expResultFile: File to dump the experiment results as a .csv file
+
+    def runServerSide(self, word_frequency):
+
+        priv_count_sketch = PrivateCountSketch(self.l, self.w, self.epsilon)
+
+        for index, row in word_frequency.iterrows():
             for i in range(row['trueFrequency']):
-                counter += 1
-                # if counter % 10000 == 0:
-                #    print counter, row['word'], row['trueFrequency']
+                priv_count_sketch.set_sketch_element(row['word'])
 
-                privCountSketch.setSketchElement(row['word'])
+        priv_frequency = [0] * len(word_frequency)
+        priv_error = [0] * len(word_frequency)
+        for i, word in enumerate(word_frequency['word']):
+            priv_frequency[i] = int(priv_count_sketch.get_freq_estimate(word))
+            priv_error[i] = int(priv_frequency[i] - word_frequency['trueFrequency'][i])
 
-        privFrequency = [0] * len(wordFrequency)
-        privError = [0] * len(wordFrequency)
-        for i, word in enumerate(wordFrequency['word']):
-            privFrequency[i] = int(privCountSketch.getFreqEstimate(word))
-            privError[i] = int(privFrequency[i] - wordFrequency['trueFrequency'][i])
+        word_frequency['privateFreq_run_freq'] = priv_frequency
+        word_frequency['privateFreq_run_error'] = priv_error
 
-        wordFrequency['privateFreq_run_freq' + str(run)] = privFrequency
-        wordFrequency['privateFreq_run_error' + str(run)] = privError
-        sketchFilePrefix = configFileName.replace('.txt', '') + '_run_'
-        # Uncomment to write the sketch
-        # PrivCountSketch.countSketch.writeSketchToFile(filePrefix + sketchFilePrefix + str(run) + '.npy')
+        print(word_frequency)
+        return word_frequency
 
-    # wordFrequency['Mean_Freq'] = wordFrequency[list(range(2, 2 + 2 * config.numOfRunsPerDataFile, 2))].mean(axis=1)
-    # wordFrequency['StdDev_Freq'] = wordFrequency[list(range(2, 2 + 2 * config.numOfRunsPerDataFile, 2))].std(axis=1)
-    # wordFrequency['Error_Mean'] = wordFrequency[list(range(3, 3 + 2 * config.numOfRunsPerDataFile, 2))].mean(axis=1)
-    # wordFrequency['Error_StdDev'] = wordFrequency[list(range(3, 3 + 2 * config.numOfRunsPerDataFile, 2))].std(axis=1)
+    def runServerSideWordDiscovery(self, word_frequency):
 
-    wordFrequency.to_csv(config.dataPath + filePrefix + exptResultFile, sep=',')
+        word_length = self.num_n_grams * self.gram_length
+        n_gram_set = self._gen_english_n_grams(self.gram_length)
 
+        pres_rec_df = pd.DataFrame(['NumOfWords', 'Precision', 'Recall'], columns=['Measure'])
 
-def runServerSideWordDiscovery(wordFrequency, configFileName, exptResultFile, filePrefix=''):
-    config.dumpConfig(filePrefix + configFileName)
-    wordLength = config.numNgrams * config.gramLength
-    NGramSet = config.genEnglishNgrams(config.gramLength)
+        priv_count_sketch = PrivateCountSketch(self.l, self.w, self.epsilon, use_median=True)
+        main_count_sketch = PrivateCountSketch(self.l, self.w, self.epsilon)
 
-    precisionRecallMetricFileName = exptResultFile.replace('.csv', '_PR.csv')
-    presRecDF = pd.DataFrame(['NumOfWords', 'Precision', 'Recall'], columns=['Measure'])
-
-    for run in range(config.numOfRunsPerDataFile):
-        print('Running for iteration = ', run)
-        counter = 0
-        privCountSketch.sketchMatrix = np.zeros((config.l, config.w))
-        for index, row in wordFrequency.iterrows():
+        # Simulating client-side
+        for index, row in word_frequency.iterrows():
             for i in range(row['trueFrequency']):
-                counter += 1
-                # if counter % 10000 == 0: print counter, row['word'], row['trueFrequency']
 
-                currentWord = row['word']
-                if len(currentWord) <= wordLength:
-                    currentWord += config.emptyChar * (wordLength - len(currentWord))
+                current_word = row['word']
+                main_count_sketch.set_sketch_element(current_word)
+
+                if len(current_word) <= word_length:
+                    current_word += self.empty_char * (word_length - len(current_word))
                 else:
-                    currentWord = currentWord[:wordLength]
+                    current_word = current_word[:word_length]
 
-                wordToSend = config.chooseRandomNGramPrefix(currentWord, config.gramLength)
+                word_to_send = self._choose_random_n_gram_prefix(current_word, self.gram_length)
 
-                privCountSketch.setSketchElement(wordToSend)
+                priv_count_sketch.set_sketch_element(word_to_send)
 
-        # Frequency estimation section
-        scalingFactor = config.numNgrams
-        listNGrams = config.genEnglishNgrams(config.gramLength)
-        listNGrams = [s + config.emptyChar * (wordLength - len(s)) for s in listNGrams]
-        wordQueue = deque(listNGrams)
-        noisyFrequencies = {}
-        tempCounter = 0
-        while (wordQueue.__len__() != 0):
-            currentPrefix = wordQueue.popleft()
-            currentPrefixAfterStrippingEmpty = currentPrefix.replace(config.emptyChar, '')
-            freqForCurrentPrefix = int(privCountSketch.getFreqEstimate(currentPrefix) * scalingFactor)
+        # Server-side Frequency estimation section
+        scaling_factor = self.num_n_grams
+        list_n_grams = self._gen_english_n_grams(self.gram_length)
+        list_n_grams = [s + self.empty_char * (word_length - len(s)) for s in list_n_grams]
+        word_queue = deque(list_n_grams)
+        noisy_frequencies = {}
 
-            if freqForCurrentPrefix < config.threshold:
+        while (word_queue.__len__() != 0):
+            current_prefix = word_queue.popleft()
+            current_prefix_after_stripping_empty = current_prefix.replace(self.empty_char, '')
+            freq_for_current_prefix = int(priv_count_sketch.get_freq_estimate(current_prefix) * scaling_factor)
+
+            if freq_for_current_prefix < self.threshold:
                 continue
 
-            if len(currentPrefixAfterStrippingEmpty) == wordLength:
-                noisyFrequencies[currentPrefixAfterStrippingEmpty] = freqForCurrentPrefix
+            if len(current_prefix_after_stripping_empty) == word_length:
+                noisy_frequencies[current_prefix_after_stripping_empty] = freq_for_current_prefix
                 continue
 
-            if tempCounter % 1000 == 0:
-                print(
-                'Running for iteration = ' + str(tempCounter) + ' , with queue length = ' + str(
-                    wordQueue.__len__()) + ', current prefix = ' + currentPrefixAfterStrippingEmpty + ' current frequency=' + str(
-                    freqForCurrentPrefix))
-                print(wordQueue)
-            tempCounter += 1
-
-            for gram in NGramSet:
-                toAdd = currentPrefixAfterStrippingEmpty + gram + config.emptyChar * (
-                            wordLength - (len(currentPrefixAfterStrippingEmpty) + config.gramLength))
-                wordQueue.append(toAdd)
+            for gram in n_gram_set:
+                toAdd = current_prefix_after_stripping_empty + gram + self.empty_char * (
+                        word_length - (len(current_prefix_after_stripping_empty) + self.gram_length))
+                word_queue.append(toAdd)
 
         TP = 0.0
         FN = 0.0
-        privFrequency = [0] * len(wordFrequency)
-        print(len(wordFrequency))
-        print(privFrequency)
-        print(noisyFrequencies)
-        for index, row in wordFrequency.iterrows():
+        priv_frequency = [0] * len(word_frequency)
+
+        for index, row in word_frequency.iterrows():
             word = row['word']
-            trueFrequency = row['trueFrequency']
-            if word not in list(noisyFrequencies.keys()):
-                privFrequency[index] = 0
-                if trueFrequency > config.threshold:
+            true_frequency = row['trueFrequency']
+            if word not in list(noisy_frequencies.keys()):
+                priv_frequency[index] = 0
+                if true_frequency > self.threshold:
                     FN += 1
             else:
-                privFrequency[index] = noisyFrequencies[word]
-                if trueFrequency > config.threshold:
+                priv_frequency[index] = noisy_frequencies[word]
+                if true_frequency > self.threshold:
                     TP += 1
 
-
-        print(privFrequency)
-        print(TP)
-        print(noisyFrequencies.__len__())
-        FP = noisyFrequencies.__len__() - TP
+        FP = noisy_frequencies.__len__() - TP
         precision = TP / (TP + FP)
         recall = TP / (TP + FN)
 
-        wordFrequency['privateFreq_run_' + str(run)] = privFrequency
-        presRecDF['Run_' + str(run)] = [wordFrequency.__len__(), precision, recall]
+        word_frequency['privateFreq_run'] = priv_frequency
+        pres_rec_df['Run'] = [word_frequency.__len__(), precision, recall]
 
-        sketchFilePrefix = configFileName.replace('.txt', '') + '_run_'
-        # Uncomment to write the sketch
-        # PrivCountSketch.countSketch.writeSketchToFile(filePrefix + sketchFilePrefix + str(run) + '.npy')
+        # Reapproximate frequencies based on the minimum of the estimates of fragment frequency vs whole dataset frequenc
+        heavy_hitters = {}
+        for key, value in noisy_frequencies.items():
+            freq = main_count_sketch.get_freq_estimate(key)
+            if min(value,freq) >= 0:
+                heavy_hitters[key] = min(value,freq)
 
-    # wordFrequency['Mean_Freq'] = wordFrequency[list(range(2, 2 + config.numOfRunsPerDataFile))].mean(axis=1)
-    # wordFrequency['StdDev_Freq'] = wordFrequency[list(range(2, 2 + config.numOfRunsPerDataFile))].std(axis=1)
-    #
-    # presRecDF['Mean_Estimate'] = presRecDF[list(range(1, 1 + config.numOfRunsPerDataFile))].mean(axis=1)
-    # presRecDF['Std_Dev'] = presRecDF[list(range(1, 1 + config.numOfRunsPerDataFile))].std(axis=1)
+        #print(heavy_hitters)
+        #return list(noisy_frequencies.items())
 
-    wordFrequency.to_csv(config.dataPath + filePrefix + exptResultFile, sep=',')
-    presRecDF.to_csv(config.dataPath + filePrefix + precisionRecallMetricFileName, sep=',')
-
-    for word in noisyFrequencies.keys():
-        print(privCountSketch.getFreqEstimate(word))
-
-    return noisyFrequencies
+        return list(heavy_hitters.items())
