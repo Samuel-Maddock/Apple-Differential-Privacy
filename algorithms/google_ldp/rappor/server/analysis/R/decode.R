@@ -123,7 +123,7 @@ FitLasso <- function(X, Y, intercept = TRUE) {
                     # Cap the number of non-zero coefficients to 500 or
                     # 80% of the length of Y, whichever is less. The 500 cap
                     # is for performance reasons, 80% is to avoid overfitting.
-                    pmax = min(500, length(Y) * .8)),
+                    pmax = min(500, length(Y)), alpha=1),
              silent = TRUE)
 
   # If fitting fails, return an empty data.frame.
@@ -133,6 +133,7 @@ FitLasso <- function(X, Y, intercept = TRUE) {
     coefs <- coef(mod)
     coefs <- coefs[-1, ncol(coefs), drop = FALSE]  # coefs[1] is the intercept
   }
+
   coefs
 }
 
@@ -378,7 +379,7 @@ Decode <- function(counts, map, params, alpha = 0.05,
 
   # Run the fitting procedure several times (5 seems to be sufficient and not
   # too many) to estimate standard deviation of the output.
-  for(r in 1:5) {
+  for(r in 1:500) {
     if(r > 1)
       e <- Resample(estimates_stds_filtered)
     else
@@ -393,7 +394,7 @@ Decode <- function(counts, map, params, alpha = 0.05,
 
   # Only select coefficients more than two standard deviations from 0. May
   # inflate empirical SD of the estimates.
-  reported <- which(coefs_ave > 1E-6 + 2 * coefs_ssd)
+  reported <- which(coefs_ave > 0)
 
   mod <- list(coefs = coefs_ave[reported], stds = coefs_ssd[reported])
 
