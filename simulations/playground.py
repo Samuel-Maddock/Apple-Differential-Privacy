@@ -1,4 +1,5 @@
 from simulations.frequency_oracles.NormalDistSimulation import NormalDistSimulation
+from simulations.heavy_hitters.ExponentialDistSimulation import ExponentialDistSimulation
 import math
 
 # -------------------- Parameters for simulation --------------------
@@ -16,7 +17,7 @@ epsilon = 3
 # PrivCountSketch Parameters
 l = 250
 numBits = int(math.floor(math.log(N, 2)) + 1)
-w = 2**numBits
+w = 2 ** numBits
 
 # RAPPOR Parameters
 num_bloombits = 128  # Max size is 256 bits
@@ -30,7 +31,7 @@ prob_f = 0
 
 # Hashtogram Parameters
 R = 100
-T =  100
+T = 100
 
 # -------------------- Simulation Code --------------------
 
@@ -53,3 +54,61 @@ rappor = {
 normal_simulation.run_and_plot([("cms", cms), ("hcms", cms), ("priv_count_sketch", priv_count_sketch),
                                 ("priv_count_sketch_median", priv_count_sketch), ("explicit_hist", explicit_hist),
                                 ("hashtogram", hashtogram), ("hashtogram_median", hashtogram), ("rappor", rappor)])
+
+# normal_simulation.run_and_plot([("rappor", rappor)])
+
+# m = 2048
+# k = 1024  # We use k = k_prime and m = m_prime for our simulation
+#
+# epsilon = 3
+# epsilon_prime = 3
+# threshold = 30
+#
+# N = 10000
+# p = 0.18
+# alphabet = list("abc")
+# word_length = 6
+# word_sample_size = 15
+#
+# sfp = {
+#     "m": m,
+#     "k": k,
+#     "epsilon": epsilon,
+#     "m_prime": m,
+#     "k_prime": k,
+#     "epsilon_prime": epsilon_prime,
+#     "threshold": threshold,
+#     "alphabet": alphabet
+# }
+#
+# bitstogram = {
+#     "epsilon": epsilon,
+#     "R": 10,
+#     "T": 10,
+#     "binary_domain_size": 32
+# }
+#
+#
+# numBits = int(math.floor(math.log(math.sqrt(N), 2)) + 1)
+# w = 2**numBits # Sketch size
+#
+# assert (int(math.log(w, 2)) <= 254), 'Sketch size (w) too large'
+#
+# l = 250  # Number of hash function pairs (f,g)
+#
+# num_n_grams = 3 # Number of N-grams
+# gram_length = 2  # Gram length
+# threshold = 10 * int(math.sqrt(N))  # Threshold for discoverability
+#
+# treehistogram = {
+#     "epsilon": epsilon,
+#     "l": l,
+#     "w": w,
+#     "num_n_grams": num_n_grams,
+#     "gram_length": gram_length,
+#     "threshold": threshold
+# }
+#
+# exponential_simulation = ExponentialDistSimulation(N, p, alphabet, word_length, word_sample_size)
+#
+# exponential_simulation.run_and_plot([("sfp", sfp), ("treehistogram", treehistogram)])
