@@ -22,7 +22,8 @@ threshold = 30
 N = 10000
 alphabet = list("abc")
 word_size = 6
-word_sample_size = 10
+word_sample_size = 15
+
 
 # -------------------- Generating Test Data --------------------
 
@@ -40,6 +41,7 @@ for i in range(0, word_size):
 # Form all possible strings of length word_size from our given alphabet
 strings = list(set(map(lambda x: str().join(x), itertools.product(*alphabet_list))))
 
+
 def generate_words(n):
     words = set()
     for i in range(0, n):
@@ -49,7 +51,7 @@ def generate_words(n):
 
 words = generate_words(word_sample_size)
 
-print("Test data generated in: " + str(time.time()-start_time) + " seconds")
+print("Test data generated in: " + str(time.time() - start_time) + " seconds")
 start_time = time.time()
 
 # -------------------- Simulating the client-side process --------------------
@@ -60,13 +62,17 @@ sfp_data = []  # Client-side data returned from SFP
 hash_families = cms_helper.generate_hash_funcs(k, m), cms_helper.generate_hash_funcs(k, m)
 client_sfp = ClientSFP([(epsilon, m), (epsilon_prime, m)], hash_families, cms_helper.generate_256_hash())
 
-for i in range(0, N):
-    word = np.random.choice(words)  # Sample randomly from our generated words
-    dataset.append(word)  # Add the word to our dataset
-    sfp_data.append(client_sfp.fragment(word))  # Client_SFP the word and add it to the sfp_data
+geometric = Counter(np.random.geometric(p=0.18, size=N))
+
+for i, word in enumerate(words):
+    frequency = geometric.get(i+1)
+
+    for j in range(0, frequency):
+        dataset.append(word)  # Add the word to our dataset
+        sfp_data.append(client_sfp.fragment(word))  # Client_SFP the word and add it to the sfp_data
 
 freq_data = Counter(dataset)  # Generate frequency data on our original dataset
-print("Data was privatised in: " + str(time.time()-start_time) + " seconds")
+print("Data was privatised in: " + str(time.time() - start_time) + " seconds")
 start_time = time.time()
 
 # -------------------- Simulating the server-side process --------------------
@@ -74,19 +80,17 @@ start_time = time.time()
 server_sfp = ServerSFP([(epsilon, k, m), (epsilon_prime, k, m)], hash_families, threshold)
 D, freq_oracle = server_sfp.generate_frequencies(sfp_data, alphabet)
 
-print(D)
-
 sfp_freq_data = HeavyHitterList(len(D))
 
 for i in range(0, len(D)):
     sfp_freq_data.append((D[i], freq_oracle(D[i])))
 
-print("Server Side SFP was calculated in: " + str(time.time()-start_time) + " seconds")
+print("Server Side SFP was calculated in: " + str(time.time() - start_time) + " seconds")
 
 # -------------------- Plotting the data --------------------
 print("Plotting results...")
 
-fig, axs = plt.subplots(2, figsize=(8,8))
+fig, axs = plt.subplots(2, figsize=(8, 8))
 ax1 = axs[0]
 ax2 = axs[1]
 
@@ -100,7 +104,6 @@ ax1.set_xlabel("Words")
 ax1.set_ylabel("Word Count")
 ax1.set_title("Words and their frequencies in the dataset")
 
-print(sfp_freq_data)
 x2, y2 = zip(*reversed(sfp_freq_data.get_data()))
 
 # Generate colour palette for the the graph of sfp data
@@ -119,7 +122,9 @@ sns.barplot(list(x2), list(y2), ax=ax2, palette=palette)
 ax2.tick_params(rotation=45)
 ax2.set_xlabel("Words Discovered")
 ax2.set_ylabel("Estimated Word Count")
-ax2.set_title("Discovered words and their estimated frequencies \n Using SFP(($\epsilon, \epsilon^\prime$) = {},{}, ($m,m^\prime$) = {},{}, ($k,k^\prime$)={},{})".format(epsilon, epsilon_prime,m,m,k,k))
+ax2.set_title(
+    "Discovered words and their estimated frequencies \n Using SFP(($\epsilon, \epsilon^\prime$) = {},{}, ($m,m^\prime$) = {},{}, ($k,k^\prime$)={},{})".format(
+        epsilon, epsilon_prime, m, m, k, k))
 
 fig.tight_layout()
 

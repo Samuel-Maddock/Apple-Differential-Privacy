@@ -73,8 +73,6 @@ class ServerSFP:
                 key,value = self.__split_fragment(fragment)
                 hash_table[key][l].append(value)
 
-        print(hash_table)
-
         for dictionary in hash_table.values():
             fragment_list = list(dictionary.values())
             if len(fragment_list) == 3: # TODO: Hacky
