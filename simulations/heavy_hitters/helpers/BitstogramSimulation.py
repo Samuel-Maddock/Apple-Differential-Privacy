@@ -7,12 +7,10 @@ class BitstogramSimulation:
         self.epsilon = params["epsilon"]
         self.R = params["R"]
         self.T = params["T"]
-        self.binary_domain_size = params["binary_domain_size"]
+        self.word_length = params["word_length"]
 
     def run(self, data):
-        print("Bitstogram is doing its thing...")
         h = cms_helper.generate_hash_funcs(self.R, self.T)
-        heavy_hitters = Bitstogram(data, h, self.T, self.binary_domain_size, self.epsilon)
-        print(heavy_hitters.find_heavy_hitters())
+        heavy_hitters = Bitstogram(data, h, self.T, self.word_length, self.epsilon)
 
-        return heavy_hitters.find_heavy_hitters()
+        return heavy_hitters.test()

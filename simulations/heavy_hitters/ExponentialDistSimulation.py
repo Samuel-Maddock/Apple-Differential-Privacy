@@ -7,6 +7,7 @@ import itertools
 from collections import Counter
 from simulations.heavy_hitters.helpers.SFPSimulation import SFPSimulation
 from simulations.heavy_hitters.helpers.TreehistogramSimulation import TreeHistogramSimulation
+from simulations.heavy_hitters.helpers.SuccinctHistSimulation import SuccinctHistSimulation
 from simulations.heavy_hitters.helpers.BitstogramSimulation import BitstogramSimulation
 
 class ExponentialDistSimulation:
@@ -59,6 +60,7 @@ class ExponentialDistSimulation:
         heavy_hitters = {
             "sfp": lambda parameters: SFPSimulation(parameters),
             "treehistogram": lambda parameters: TreeHistogramSimulation(parameters),
+            "succincthist": lambda parameters: SuccinctHistSimulation(parameters),
             "bitstogram": lambda parameters: BitstogramSimulation(parameters)
         }
 
@@ -94,7 +96,8 @@ class ExponentialDistSimulation:
         ax1.set_title("Words and their frequencies in the dataset")
 
         for i, plot_data in enumerate(self.experiment_plot_data):
-            experimennt_name = plot_data[0]
+            experiment_name = plot_data[0][0]
+            params = plot_data[0][1]
             heavy_hitter_data = plot_data[1]
 
             ax = axs[i+1]
@@ -106,12 +109,16 @@ class ExponentialDistSimulation:
             ax.tick_params(rotation=45)
             ax.set_xlabel("Words Discovered")
             ax.set_ylabel("Estimated Word Count")
-            # ax.set_title(
-            #     "Discovered words and their estimated frequencies \n Using SFP(($\epsilon, \epsilon^\prime$) = {},{}, ($m,m^\prime$) = {},{}, ($k,k^\prime$)={},{})".format(
-            #         epsilon, epsilon_prime, m, m, k, k))
+            ax.set_title(
+                "Discovered words and their estimated frequencies \n Experiment: " + experiment_name)
 
         fig.tight_layout()
-        plt.savefig("sfp.png")
+
+        if not os.path.exists('plots'):
+            os.mkdir('plots')
+
+        filename = "plots/" + "exponential_exp" + str(uuid.uuid4()) + ".png"
+        plt.savefig(filename)
         plt.show()
         print("Plot saved, simulation ended...")
 
