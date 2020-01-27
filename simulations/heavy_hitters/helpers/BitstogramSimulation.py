@@ -13,4 +13,4 @@ class BitstogramSimulation:
         h = cms_helper.generate_hash_funcs(self.R, self.T)
         heavy_hitters = Bitstogram(data, h, self.T, self.word_length, self.epsilon)
 
-        return heavy_hitters.test()
+        return heavy_hitters.find_heavy_hitters()

@@ -45,7 +45,7 @@ class NormalDistSimulation:
     def _plot(self):
         bins = np.arange(start=min(self.data), stop=max(self.data) + 1)
 
-        figsize = (len(self.experiment_plot_data)*5, len(self.experiment_plot_data)*5)
+        figsize = (len(self.experiment_plot_data)*2, len(self.experiment_plot_data)*5)
 
         fig, axs = plt.subplots(len(self.experiment_plot_data) + 2, figsize=figsize)
         colours = sns.color_palette("hls", len(self.experiment_plot_data) + 1) # Generate colours for each plot
@@ -63,6 +63,8 @@ class NormalDistSimulation:
 
             # Plotting a distplot of the data produced from the experiment
             sns.distplot(experiment_data, bins=bins, ax=axs[i + 1], color=colours[i+1], hist_kws={'ec': "black"})
+            sns.distplot(self.data, bins=bins, hist=False, ax=axs[i+1], color=colours[0])
+
             axs[i+1].set_title(
                 "Differentially private " + experiment_name + " data produced from the normal sample \n Parameters: " + str(experiment_params))
 
@@ -77,7 +79,7 @@ class NormalDistSimulation:
         if not os.path.exists('plots'):
             os.mkdir('plots')
 
-        filename = "plots/" + "experiment" + str(uuid.uuid4()) + ".png"
+        filename = "plots/" + "normal_exp" + str(uuid.uuid4()) + ".png"
 
         plt.savefig(filename)
         plt.show()
