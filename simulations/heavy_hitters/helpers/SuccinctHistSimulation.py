@@ -4,10 +4,12 @@ from collections import Counter
 
 from algorithms.bnst_ldp.Bitstogram.SuccinctHist import SuccintHist
 from algorithms.apple_ldp.sfp.HeavyHitterList import HeavyHitterList
+from simulations.heavy_hitters.helpers.HeavyHitterSimulation import HeavyHitterSimulation
 
 
-class SuccinctHistSimulation:
+class SuccinctHistSimulation(HeavyHitterSimulation):
     def __init__(self, params):
+        super().__init__()
         self.epsilon = params["epsilon"]
         self.T = params["T"]
         self.max_length_string = params["max_length_string"]

@@ -1,14 +1,16 @@
 import numpy as np
 from algorithms.apple_ldp.cms.client.ClientCMS import ClientCMS
-
+from collections import namedtuple
 
 class ClientSFP:
     def __init__(self, cms_params, hash_families, hash_256, fragment_length=2, max_string_length=6, padding_char="*"):
-        epsilon, m = cms_params[0]
-        epsilon_prime, m_prime = cms_params[1]
+        Parameters = namedtuple("Parameters", ["epsilon", "m"])
+        self.word_parameters = Parameters(*cms_params[0])
+        self.fragment_parameters = Parameters(*cms_params[1])
+
         self.hash_256 = hash_256
-        self.word_cms = ClientCMS(epsilon, hash_families[0], m)
-        self.fragment_cms = ClientCMS(epsilon_prime, hash_families[1], m_prime)
+        self.word_cms = ClientCMS(self.word_parameters.epsilon, hash_families[0], self.word_parameters.m)
+        self.fragment_cms = ClientCMS(self.fragment_parameters.epsilon, hash_families[1], self.fragment_parameters.m)
         self.max_string_length = max_string_length
         self.padding_char = padding_char
         self.fragment_length = fragment_length

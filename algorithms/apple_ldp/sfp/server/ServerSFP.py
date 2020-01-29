@@ -78,6 +78,6 @@ class ServerSFP:
         for dictionary in hash_table.values():
             fragment_list = list(dictionary.values())
             if len(fragment_list) == int(self.max_string_length / self.fragment_length):
-                D += list(map(lambda x: str().join(x).strip(self.padding_char), itertools.product(*fragment_list)))
+                D += list(map(lambda x: str().join(x).split(self.padding_char)[0], itertools.product(*fragment_list)))
 
         return D, freq_oracle

@@ -4,11 +4,15 @@ from algorithms.apple_ldp.sfp.server.ServerSFP import ServerSFP
 from algorithms.apple_ldp.sfp.client.ClientSFP import ClientSFP
 from algorithms.apple_ldp.cms.CMSHelper import cms_helper
 from algorithms.apple_ldp.sfp.HeavyHitterList import HeavyHitterList
+
+from simulations.heavy_hitters.helpers.HeavyHitterSimulation import HeavyHitterSimulation
+
 from collections import Counter
 
 
-class SFPSimulation:
+class SFPSimulation(HeavyHitterSimulation):
     def __init__(self, params):
+        super().__init__()
         self.epsilon = params["epsilon"]
         self.m = params["m"]
         self.k = params["k"]
@@ -24,14 +28,15 @@ class SFPSimulation:
         sfp_data = []
 
         hash_families = cms_helper.generate_hash_funcs(self.k, self.m), cms_helper.generate_hash_funcs(self.k_prime, self.m_prime)
-        client_sfp = ClientSFP([(self.epsilon, self.m), (self.epsilon_prime, self.m_prime)], hash_families, cms_helper.generate_256_hash())
+        client_cms_parameters = [(self.epsilon, self.m), (self.epsilon_prime, self.m_prime)]
+        client_sfp = ClientSFP(client_cms_parameters, hash_families, cms_helper.generate_256_hash())
 
         for word in data:
             sfp_data.append(client_sfp.fragment(word))  # Client_SFP the word and add it to the sfp_data
 
         # -------------------- Simulating the server-side process --------------------
-
-        server_sfp = ServerSFP([(self.epsilon, self.k, self.m), (self.epsilon_prime, self.k_prime, self.m_prime)], hash_families, self.threshold)
+        cms_parameters = [(self.epsilon, self.k, self.m), (self.epsilon_prime, self.k_prime, self.m_prime)]
+        server_sfp = ServerSFP(cms_parameters, hash_families, self.threshold)
         D, freq_oracle = server_sfp.generate_frequencies(sfp_data, self.alphabet)
 
         sfp_freq_data = HeavyHitterList(len(D))
