@@ -16,9 +16,15 @@ class ServerSFP:
         self.fragment_parameters = Parameters(*cms_params[1])
         self.word_hash_functions, self.fragment_hash_functions = hash_families
         self.threshold = threshold
+
         self.fragment_length = fragment_length
         self.max_string_length = max_string_length
         self.padding_char = padding_char
+
+        if max_string_length is None:
+            self.max_string_length = 6
+        if fragment_length is None:
+            self.fragment_length = 2
 
     def __create_fragment_estimators(self, data, indexes):
         estimator_dict = {}
@@ -27,10 +33,11 @@ class ServerSFP:
         for index_data_pair in zip(indexes, data):
             dict_vals[index_data_pair[0]].append(index_data_pair[1])
 
-        for l in range(0, 10):
+        for l in range(0, self.max_string_length):
             if dict_vals.get(l) is not None:
                 M = SketchGenerator(*self.fragment_parameters).create_cms_sketch(dict_vals.get(l))
                 estimator_dict[l] = ServerCMS(M, self.fragment_hash_functions).estimate_freq
+
         return estimator_dict
 
     def __generate_frequent_fragments(self, fragments, estimators):
@@ -43,6 +50,11 @@ class ServerSFP:
     def __split_fragment(self, fragment):
         fragment_split = fragment.split("_", 1)
         return fragment_split[0], fragment_split[1]
+
+    def __generate_possible_fragments(self, alphabet):
+
+        fragment_arr = itertools.product(alphabet, repeat=self.fragment_length)
+        return list(map(lambda x: "".join(x), fragment_arr))
 
     def generate_frequencies(self, sfp_data, alphabet):
         alpha_list, beta_list, index_list = list(zip(*sfp_data))
@@ -57,7 +69,7 @@ class ServerSFP:
         fragments = []
         frequency_dict = defaultdict(lambda: HeavyHitterList(self.threshold))
 
-        fragments = list(map(lambda x: x[0] + x[1], itertools.product(alphabet, alphabet)))
+        fragments = self.__generate_possible_fragments(alphabet)
 
         for i in range(0, 256):
             for fragment in fragments:
@@ -68,7 +80,8 @@ class ServerSFP:
 
         hash_table = defaultdict(lambda: defaultdict(list))
 
-        fragment_indices = np.arange(1, self.max_string_length, step=self.fragment_length)
+        fragment_indices = np.arange(0, self.max_string_length, step=self.fragment_length)
+
         for l in fragment_indices:
             fragments, frequencies = zip(*frequency_dict.get(l).get_data())
             for fragment in fragments:

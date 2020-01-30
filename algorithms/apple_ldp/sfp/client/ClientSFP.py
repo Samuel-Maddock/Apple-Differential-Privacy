@@ -11,9 +11,16 @@ class ClientSFP:
         self.hash_256 = hash_256
         self.word_cms = ClientCMS(self.word_parameters.epsilon, hash_families[0], self.word_parameters.m)
         self.fragment_cms = ClientCMS(self.fragment_parameters.epsilon, hash_families[1], self.fragment_parameters.m)
+
         self.max_string_length = max_string_length
         self.padding_char = padding_char
         self.fragment_length = fragment_length
+
+        if max_string_length is None:
+            self.max_string_length = 6
+        if fragment_length is None:
+            self.fragment_length = 2
+
 
     def fragment(self, string):
 
@@ -23,7 +30,7 @@ class ClientSFP:
         elif len(string) > self.max_string_length:
             string = string[0:self.max_string_length]
 
-        fragment_indices = np.arange(1, len(string), step=self.fragment_length)
+        fragment_indices = np.arange(0, len(string), step=self.fragment_length)
         l = np.random.choice(fragment_indices)
-        r = str(self.hash_256(string)) + "_" + string[l-1: l + (self.fragment_length-1)]
+        r = str(self.hash_256(string)) + "_" + string[l: l + (self.fragment_length)]
         return self.fragment_cms.client_cms(r), self.word_cms.client_cms(string), l

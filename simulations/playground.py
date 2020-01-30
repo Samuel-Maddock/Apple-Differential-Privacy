@@ -64,7 +64,7 @@ epsilon = 3
 epsilon_prime = 3
 threshold = 30
 
-N = 20000
+N = 10000
 p = 0.3
 alphabet = list("abc")
 word_length = 6
@@ -78,8 +78,16 @@ sfp = {
     "k_prime": k,
     "epsilon_prime": epsilon_prime,
     "threshold": threshold,
-    "alphabet": alphabet
+    "alphabet": alphabet,
+    "fragment_length": 2,
+    "max_string_length": 6
 }
+
+sfp1 = sfp.copy()
+sfp1["fragment_length"] = 3
+
+sfp2 = sfp.copy()
+sfp2["fragment_length"] = 1
 
 bitstogram = {
     "epsilon": epsilon,
@@ -122,4 +130,5 @@ treehistogram = {
 
 exponential_simulation = ExponentialDistSimulation(N, p, alphabet, word_length, word_sample_size)
 
-exponential_simulation.run_and_plot([("sfp", sfp), ("treehistogram", treehistogram), ("succincthist", succincthist), ("bitstogram", bitstogram)])
+exponential_simulation.run_and_plot([("sfp", sfp), ("sfp", sfp1), ("sfp", sfp2)])
+

@@ -83,8 +83,8 @@ class ExponentialDistSimulation:
         freq_data = Counter(self.data)
         print("Plotting results...")
 
-        figsize = (len(self.experiment_plot_data)*2, len(self.experiment_plot_data)*5)
-        fig, axs = plt.subplots(len(self.experiment_plot_data)+1, figsize=(8, 8))
+        figsize = (len(self.experiment_plot_data)*3, len(self.experiment_plot_data)*6)
+        fig, axs = plt.subplots(len(self.experiment_plot_data)+1, figsize=figsize)
         ax1 = axs[0]
 
         # Plots the words and their frequencies in descending order
@@ -98,10 +98,14 @@ class ExponentialDistSimulation:
 
         for i, plot_data in enumerate(self.experiment_plot_data):
             experiment_name = plot_data[0][0]
-            params = plot_data[0][1]
+            experiment_params = plot_data[0][1]
             heavy_hitter_data = plot_data[1]
 
             ax = axs[i+1]
+
+            if len(heavy_hitter_data) == 0:
+                heavy_hitter_data.add(("empty", 0))
+
             x, y = zip(*reversed(heavy_hitter_data))
             palette = self._generate_palette(color_palette, x1, x)
 
@@ -110,8 +114,11 @@ class ExponentialDistSimulation:
             ax.tick_params(rotation=45)
             ax.set_xlabel("Words Discovered")
             ax.set_ylabel("Estimated Word Count")
+
             ax.set_title(
                 "Discovered words and their estimated frequencies \n Experiment: " + experiment_name)
+                #+ "\n Parameters: " + str(experiment_params) )
+
 
         fig.tight_layout()
 
