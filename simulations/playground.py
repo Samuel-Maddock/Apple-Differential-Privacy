@@ -1,5 +1,7 @@
 from simulations.frequency_oracles.NormalDistSimulation import NormalDistSimulation
 from simulations.heavy_hitters.ExponentialDistSimulation import ExponentialDistSimulation
+from simulations.heavy_hitters.NLTKSimulation import NLTKSimulation
+
 import math
 
 # #-------------------- Parameters for simulation --------------------
@@ -102,33 +104,37 @@ succincthist = {
     "T": 10,
 }
 
-d = word_length * 8
-logd = d
-w = 32 * logd*math.log(16*logd,2) + ((48/epsilon)*math.sqrt(2*N*logd*math.log(64*logd)))
-T = 32*N/w
+# d = word_length * 8
+# logd = d
+# w = 32 * logd*math.log(16*logd,2) + ((48/epsilon)*math.sqrt(2*N*logd*math.log(64*logd)))
+# T = 32*N/w
+#
+# numBits = int(math.floor(math.log(math.sqrt(N), 2)) + 1)
+# w = 2**numBits # Sketch size
+# print(w)
+# w = 128
+# assert (int(math.log(w, 2)) <= 254), 'Sketch size (w) too large'
+#
+# l = 250  # Number of hash function pairs (f,g)
+#
+# num_n_grams = 3 # Number of N-grams
+# gram_length = 2  # Gram length
+# threshold = 3 * int(math.sqrt(N))  # Threshold for discoverability
+#
+# treehistogram = {
+#     "epsilon": epsilon,
+#     "l": l,
+#     "w": w,
+#     "num_n_grams": num_n_grams,
+#     "gram_length": gram_length,
+#     "threshold": threshold
+# }
+#
+# exponential_simulation = ExponentialDistSimulation(N, p, alphabet, word_length, word_sample_size)
+#
+# exponential_simulation.run_and_plot([("sfp", sfp), ("sfp", sfp1), ("sfp", sfp2)])
+#
 
-numBits = int(math.floor(math.log(math.sqrt(N), 2)) + 1)
-w = 2**numBits # Sketch size
-print(w)
-w = 128
-assert (int(math.log(w, 2)) <= 254), 'Sketch size (w) too large'
+nltk_simulation = NLTKSimulation(6)
 
-l = 250  # Number of hash function pairs (f,g)
-
-num_n_grams = 3 # Number of N-grams
-gram_length = 2  # Gram length
-threshold = 3 * int(math.sqrt(N))  # Threshold for discoverability
-
-treehistogram = {
-    "epsilon": epsilon,
-    "l": l,
-    "w": w,
-    "num_n_grams": num_n_grams,
-    "gram_length": gram_length,
-    "threshold": threshold
-}
-
-exponential_simulation = ExponentialDistSimulation(N, p, alphabet, word_length, word_sample_size)
-
-exponential_simulation.run_and_plot([("sfp", sfp), ("sfp", sfp1), ("sfp", sfp2)])
-
+nltk_simulation.run_and_plot([("sfp", sfp)])

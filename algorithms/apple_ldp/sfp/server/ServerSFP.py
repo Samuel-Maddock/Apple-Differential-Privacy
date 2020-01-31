@@ -57,6 +57,8 @@ class ServerSFP:
         return list(map(lambda x: "".join(x), fragment_arr))
 
     def generate_frequencies(self, sfp_data, alphabet):
+        alphabet.add(self.padding_char)
+
         alpha_list, beta_list, index_list = list(zip(*sfp_data))
 
         word_sketch_generator = SketchGenerator(*self.word_parameters)
@@ -88,9 +90,11 @@ class ServerSFP:
                 key, value = self.__split_fragment(fragment)
                 hash_table[key][l].append(value)
 
+        print(hash_table.values())
         for dictionary in hash_table.values():
             fragment_list = list(dictionary.values())
-            if len(fragment_list) == int(self.max_string_length / self.fragment_length):
-                D += list(map(lambda x: str().join(x).split(self.padding_char)[0], itertools.product(*fragment_list)))
 
-        return D, freq_oracle
+            if len(dictionary.keys()) == self.max_string_length/self.fragment_length:
+                D += list(map(lambda x: str().join(x), itertools.product(*fragment_list)))
+
+        return D, freq_oracle, self.padding_char
