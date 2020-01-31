@@ -6,7 +6,7 @@ from algorithms.apple_ldp.cms.CMSHelper import cms_helper
 from algorithms.apple_ldp.sfp.HeavyHitterList import HeavyHitterList
 
 from simulations.heavy_hitters.helpers.HeavyHitterSimulation import HeavyHitterSimulation
-
+import math
 from collections import Counter
 
 
@@ -40,12 +40,13 @@ class SFPSimulation(HeavyHitterSimulation):
         # -------------------- Simulating the server-side process --------------------
         cms_parameters = [(self.epsilon, self.k, self.m), (self.epsilon_prime, self.k_prime, self.m_prime)]
         server_sfp = ServerSFP(cms_parameters, hash_families, self.threshold, fragment_length=self.fragment_length, max_string_length=self.max_string_length)
-        D, freq_oracle = server_sfp.generate_frequencies(sfp_data, self.alphabet)
+        D, freq_oracle, padding_char = server_sfp.generate_frequencies(sfp_data, self.alphabet)
 
         sfp_freq_data = HeavyHitterList(len(D))
 
         for i in range(0, len(D)):
-            sfp_freq_data.append((D[i], freq_oracle(D[i])))
+            if (freq_oracle(D[i]) >= math.sqrt(len(data))):
+                sfp_freq_data.append((D[i].split(padding_char)[0], freq_oracle(D[i])))
 
         return sfp_freq_data.get_data()
 
