@@ -3,51 +3,38 @@ import pandas as pd
 import numpy as np
 import math
 import uuid
+import itertools
 
 from algorithms.bnst_ldp.TreeHistogram.PrivateCountSketch import PrivateCountSketch
 from collections import deque
 
 
-class TreeHistogram():
-    def __init__(self, l, w, epsilon, num_n_grams, gram_length, threshold):
+class TreeHistogram:
+    def __init__(self, l, w, epsilon, num_n_grams, gram_length, threshold, alphabet):
         self.l = l
         self.w = w
         self.epsilon = epsilon
         self.num_n_grams = num_n_grams  # Number of N-grams
         self.gram_length = gram_length  # Gram length
         self.threshold = threshold
-        self.empty_char = "?"
+        self.empty_char = "*"
 
-    def checkArrayCounterMaxReached(self, arrayOfCounters):
-        if arrayOfCounters[0] == 3:
-            return True
-        return False
+        if "*" in alphabet:
+            alphabet.remove(self.empty_char)
 
-    def incrementArray(self, arrayOfCounters):
-        arrayOfCounters[-1] += 1
-        for i in range(len(arrayOfCounters) - 1, 0, -1):
-            if arrayOfCounters[i] == 3:
-                arrayOfCounters[i] = 0
-                arrayOfCounters[i - 1] += 1
+        self.alphabet = alphabet
 
-    def _choose_random_n_gram_prefix(self, word, N):
+    def __choose_random_n_gram_prefix(self, word, N):
         assert len(word) % N == 0, 'Word = ' + word + ' is not of correct length'
         random_start_index = np.random.randint(0, len(word) / N) * N
         random_prefix_word = word[0:random_start_index + N] + self.empty_char * (
                     self.gram_length * self.num_n_grams - len(word[0:random_start_index + N]))
         return random_prefix_word
 
-    def _gen_english_n_grams(self, N):
-        gram_dict = [''] * (int(math.pow(3, N)))
-        counter = 0
-        word_length = self.gram_length
-        array_of_counters = [0] * word_length
-        while(self.checkArrayCounterMaxReached(array_of_counters) == False):
-            for x in array_of_counters:
-                gram_dict[counter] += chr(97 + x)
-            counter += 1
-            self.incrementArray(array_of_counters)
-        return gram_dict
+    def __gen_english_n_grams(self, alphabet):
+        n_gram_arr = itertools.product(alphabet, repeat=self.gram_length)
+        n_gram_arr = map(lambda x: "".join(x), n_gram_arr)
+        return list(n_gram_arr)
 
     # wordFrequency: The data file as a dataframe with the two columns ['word', 'trueFrequency']
     # configFileName: File to dump the configuration parameters. Include expt info in the filename
@@ -76,7 +63,6 @@ class TreeHistogram():
     def runServerSideWordDiscovery(self, word_frequency):
 
         word_length = self.num_n_grams * self.gram_length
-        n_gram_set = self._gen_english_n_grams(self.gram_length)
 
         pres_rec_df = pd.DataFrame(['NumOfWords', 'Precision', 'Recall'], columns=['Measure'])
 
@@ -86,7 +72,6 @@ class TreeHistogram():
         # Simulating client-side
         for index, row in word_frequency.iterrows():
             for i in range(row['trueFrequency']):
-
                 current_word = row['word']
                 main_count_sketch.set_sketch_element(current_word)
 
@@ -95,21 +80,22 @@ class TreeHistogram():
                 else:
                     current_word = current_word[:word_length]
 
-                word_to_send = self._choose_random_n_gram_prefix(current_word, self.gram_length)
+                word_to_send = self.__choose_random_n_gram_prefix(current_word, self.gram_length)
 
                 priv_count_sketch.set_sketch_element(word_to_send)
 
         # Server-side Frequency estimation section
         scaling_factor = self.num_n_grams
-        list_n_grams = self._gen_english_n_grams(self.gram_length)
-        list_n_grams = [s + self.empty_char * (word_length - len(s)) for s in list_n_grams]
+        n_gram_set = self.__gen_english_n_grams(self.alphabet)
+        list_n_grams = [s + self.empty_char * (word_length - len(s)) for s in n_gram_set]
+        print(n_gram_set)
         word_queue = deque(list_n_grams)
         noisy_frequencies = {}
 
-        while (word_queue.__len__() != 0):
+        while word_queue.__len__() != 0:
             current_prefix = word_queue.popleft()
             current_prefix_after_stripping_empty = current_prefix.replace(self.empty_char, '')
-            freq_for_current_prefix = int(priv_count_sketch.get_freq_estimate(current_prefix) * scaling_factor)
+            freq_for_current_prefix = int(priv_count_sketch.get_freq_estimate(current_prefix))
 
             if freq_for_current_prefix < self.threshold:
                 continue
@@ -151,9 +137,6 @@ class TreeHistogram():
         for key, value in noisy_frequencies.items():
             freq = main_count_sketch.get_freq_estimate(key)
             if min(value,freq) >= 0:
-                heavy_hitters[key] = min(value,freq)
-
-        #print(heavy_hitters)
-        #return list(noisy_frequencies.items())
+                heavy_hitters[key] = max(value,freq)
 
         return list(heavy_hitters.items())

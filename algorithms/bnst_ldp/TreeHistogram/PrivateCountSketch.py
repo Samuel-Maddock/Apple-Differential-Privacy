@@ -1,7 +1,6 @@
-# A non-static rewrite of the PrivCountSketch.py class
-# This is mainly used in simulations to test the PrivCountSketch frequency oracle
-# TODO: The TreeHistogram algo should use this cleaner (non-static) implementation
+# A non-static rewrite of the PrivCountSketch.py class ()
 
+# This is mainly used in simulations to test the PrivCountSketch frequency oracle
 # The core logic for private count sketch [Charikar-Chen-Farach-Colton 2004]
 
 import numpy as np

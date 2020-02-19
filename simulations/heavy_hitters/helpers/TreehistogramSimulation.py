@@ -13,15 +13,17 @@ class TreeHistogramSimulation(HeavyHitterSimulation):
         self.l = params["l"]
         self.w = params["w"]
         self.epsilon = params["epsilon"]
-        self.num_n_grams = params["num_n_grams"]
+        self.max_string_length = params["max_string_length"]
         self.gram_length = params["gram_length"]
         self.threshold = params["threshold"]
+        self.alphabet = params["alphabet"]
 
     def run(self, data):
-
         data = pd.DataFrame(list(dict(Counter(data)).items()), columns=["word", "trueFrequency"])
 
-        tree_histogram = TreeHistogram(self.l, self.w, self.epsilon, self.num_n_grams, self.gram_length, self.threshold)
+        num_n_grams = int(self.max_string_length / self.gram_length)
+
+        tree_histogram = TreeHistogram(self.l, self.w, self.epsilon, num_n_grams, self.gram_length, self.threshold, self.alphabet)
 
         word_freq = tree_histogram.runServerSideWordDiscovery(data)
 
