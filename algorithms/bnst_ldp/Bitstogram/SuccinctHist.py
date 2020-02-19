@@ -6,13 +6,10 @@ from algorithms.bnst_ldp.Bitstogram.ExplicitHist import ExplicitHist
 from bitstring import BitArray
 
 # Any set [n] = {1,...,n} is represented here as {0,....,n-1} for ease of indexing
-
-# d should be the binary length of the strings in the dataset
-    # Data should be padded to some max length prior to using SuccinctHist
-    # TODO: String padding...
+# d is the binary length of the strings in the dataset
 
 class SuccintHist:
-    def __init__(self, dataset, T, d, epsilon):
+    def __init__(self, dataset, T, d, epsilon, max_string_length):
         self.epsilon = epsilon
         self.prob = 1 / ((math.e ** epsilon) + 1)
         self.n = len(dataset)
@@ -21,8 +18,8 @@ class SuccintHist:
         self.binary_domain_size = d
         self.partition = self.__generate_partition(self.n)
         self.dataset = dataset
-
-        #dataset = [BitArray(bytes=bytes(x, "utf-8")).bin for x in dataset]
+        self.padding_char = "*"
+        self.max_string_length = max_string_length
 
         # Constructing randomised dataset
         S = {}
@@ -30,6 +27,13 @@ class SuccintHist:
             tuple_set = []
             for v in self.partition[l]:
                 data = dataset[v]
+
+                # Pad strings that are smaller than the max length string in the dataset
+                if len(data) < self.max_string_length:
+                    data += (self.max_string_length - len(data)) * self.padding_char
+                elif len(data) > self.max_string_length:
+                    data = data[0:self.max_string_length]
+
                 tuple_set.append((self.hash(data), BitArray(bytes=bytes(data, "utf-8")).bin[l])) # Hash data item and sample lth bit
             S[l] = tuple_set
 
@@ -55,7 +59,7 @@ class SuccintHist:
         hist_list = []
         for l in range(0, self.binary_domain_size):
             s = self.S[l]
-            hist_list.append(ExplicitHist(s, self.T * 2, self.epsilon, index_map=self.__index_mapper))
+            hist_list.append(ExplicitHist(s, self.T * 2, self.epsilon/2, index_map=self.__index_mapper))
 
         S = set()
 
@@ -86,7 +90,7 @@ class SuccintHist:
         print(S)
         for heavy_hitter in S:
             freq = hist.freq_oracle(heavy_hitter)
-            if freq > math.sqrt(len(self.dataset)): # Heuristic to prune false positives
+            if freq > 3*math.sqrt(len(self.dataset)): # Heuristic to prune false positives
                 heavy_hitters.append((heavy_hitter, freq))
 
         print(heavy_hitters)

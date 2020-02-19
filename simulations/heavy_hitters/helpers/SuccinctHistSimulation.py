@@ -12,12 +12,12 @@ class SuccinctHistSimulation(HeavyHitterSimulation):
         super().__init__()
         self.epsilon = params["epsilon"]
         self.T = params["T"]
-        self.max_length_string = params["max_length_string"]
-        self.d = self.max_length_string * 8
+        self.max_string_length = params["max_string_length"]
+        self.d = self.max_string_length * 8
 
     def run(self, data):
 
-        succinct_hist = SuccintHist(data, self.T, self.d, self.epsilon)
+        succinct_hist = SuccintHist(data, self.T, self.d, self.epsilon, self.max_string_length)
 
         word_estimates = succinct_hist.find_heavy_hitters()
 
