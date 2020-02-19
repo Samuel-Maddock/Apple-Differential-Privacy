@@ -24,12 +24,12 @@ A good introduction and brief survey of recent LDP algorithms is presented [here
 - [ ] Google: Simulations for RAPPOR + extensions
 - [x] BNST: Implement TreeHistogram (based on code [here](https://bitbucket.org/abhradt/locallyprivatehistogram/src/master/))
 - [x] BNST: Implement the Simple Bitstogram Protocol (ExplicitHist + SuccinctHist)
-- [x] BNST: Implement the Full Bitstogram Protocol without error correcting codes
-- [ ] BNST: Add error correcting codes to the Bitstogram algorithm
-- [ ] BNST: Simulations for TreeHistogram and Bitstogram
+- [x] BNST: Implement the Full Bitstogram Protocol 
+- [x] BNST: Simulations for TreeHistogram and Bitstogram
+- [x] Misc: NYC Taxicab Simulation
+- [x] Misc: NLTK Simulation
 - [ ] Misc: Documentation !!!
-- [ ] Misc: Modularisation to support combining algorithms
-- [ ] Misc: More concrete simulations/applications
+- [ ] Misc: Support running Heavy Hitter algos with different freq oracles
 - [ ] Misc: Finishing the README
 # Resources
 1) [Algorithmic Foundations of Differential Privacy](https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf)
