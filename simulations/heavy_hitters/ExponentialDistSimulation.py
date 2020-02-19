@@ -83,7 +83,7 @@ class ExponentialDistSimulation:
         freq_data = Counter(self.data)
         print("Plotting results...")
 
-        figsize = (len(self.experiment_plot_data)*3, len(self.experiment_plot_data)*6)
+        figsize = (len(self.experiment_plot_data)*6, len(self.experiment_plot_data)*6)
         fig, axs = plt.subplots(len(self.experiment_plot_data)+1, figsize=figsize)
         ax1 = axs[0]
 

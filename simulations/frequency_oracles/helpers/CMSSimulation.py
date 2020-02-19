@@ -5,6 +5,7 @@ from algorithms.apple_ldp.cms.server.SketchGenerator import SketchGenerator
 from algorithms.apple_ldp.cms.server.ServerCMS import ServerCMS
 from algorithms.apple_ldp.cms.CMSHelper import cms_helper
 from collections import Counter
+import time
 
 
 class CMSSimulation:
@@ -20,16 +21,20 @@ class CMSSimulation:
 
         ldp_data = []
 
+        start = time.process_time()
         client_cms = ClientCMS(self.epsilon, hash_funcs, self.m)
-        sketch_generator = SketchGenerator(self.epsilon, self.k, self.m)
+        print("CMS Initialised:", time.process_time() - start)
 
+        sketch_generator = SketchGenerator(self.epsilon, self.k, self.m)
         print("Sampling data from the clients...")
+
         for i in range(0, len(data)):
             if self.is_hcms:
                 ldp_data.append(client_cms.client_hcms(data[i]))
             else:
                 ldp_data.append(client_cms.client_cms(data[i]))
 
+        print("Data Privatised:", time.process_time() - start)
         # -------------------- Simulating the server-side process --------------------
 
         # Create a sketch matrix of the ldp data
@@ -38,16 +43,15 @@ class CMSSimulation:
         else:
             M = sketch_generator.create_cms_sketch(ldp_data)
 
+        print("Sketch Generated:", time.process_time() - start)
         server_cms = ServerCMS(M, hash_funcs) # Initialise the frequency oracle
 
         print("Estimating frequencies from sketch matrix...")
-        ldp_freq = np.empty(len(domain))
         ldp_plot_data = np.empty(len(domain))
 
         # Generate both frequency data from the oracle and plot data to be graphed
         for i, item in enumerate(domain):
-            ldp_freq[i] = server_cms.estimate_freq(item) # Freq Oracle
-            ldp_plot_data = np.append(ldp_plot_data, [item]*int(round(ldp_freq[i]))) # Generate estimated dataset
+            ldp_plot_data = np.append(ldp_plot_data, [item]*int(round(server_cms.estimate_freq(item)))) # Generate estimated dataset
 
         return ldp_plot_data
 

@@ -45,7 +45,7 @@ class NormalDistSimulation:
     def _plot(self):
         bins = np.arange(start=min(self.data), stop=max(self.data) + 1)
 
-        figsize = (len(self.experiment_plot_data)*2, len(self.experiment_plot_data)*5)
+        figsize = (len(self.experiment_plot_data)*7, len(self.experiment_plot_data)*7)
 
         fig, axs = plt.subplots(len(self.experiment_plot_data) + 2, figsize=figsize)
         colours = sns.color_palette("hls", len(self.experiment_plot_data) + 1) # Generate colours for each plot

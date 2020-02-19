@@ -4,3 +4,4 @@ __pycache__/
 simulations/frequency_oracles/plots
 simulations/frequency_oracles/_RAPPOR
 simulations/frequency_oracles/NYC Simulation/Heatmaps
+simulations/frequency_oracles/NYC Simulation/data
