@@ -1,12 +1,14 @@
 from algorithms.apple_ldp.cms.server.ServerCMS import ServerCMS
 from algorithms.apple_ldp.cms.server.SketchGenerator import SketchGenerator
-from algorithms.apple_ldp.sfp.HeavyHitterList import HeavyHitterList
 from collections import namedtuple
 from collections import defaultdict
+from collections import Counter
+
 import string
 import numpy as np
-import re
 import itertools
+import time
+import pathos.pools as pp
 
 
 class ServerSFP:
@@ -40,57 +42,66 @@ class ServerSFP:
 
         return estimator_dict
 
-    def __generate_frequent_fragments(self, fragments, estimators):
-        for estimator in estimators:
-            frequencies = []
-            for fragment in fragments:
-                frequency = estimator[1](fragment)
-                frequencies.append(frequency)
-
     def __split_fragment(self, fragment):
         fragment_split = fragment.split("_", 1)
         return fragment_split[0], fragment_split[1]
 
-    def __generate_possible_fragments(self, alphabet):
-
+    def __generate_fragments(self, alphabet):
         fragment_arr = itertools.product(alphabet, repeat=self.fragment_length)
+        fragment_arr = map(lambda x: "".join(x), fragment_arr)
+        fragment_arr = itertools.product(map(str, range(0,256)), "_", fragment_arr)
         return list(map(lambda x: "".join(x), fragment_arr))
 
     def generate_frequencies(self, sfp_data, alphabet):
         alphabet.add(self.padding_char)
 
         alpha_list, beta_list, index_list = list(zip(*sfp_data))
-
         word_sketch_generator = SketchGenerator(*self.word_parameters)
         M = word_sketch_generator.create_cms_sketch(beta_list)
         freq_oracle = ServerCMS(M, self.word_hash_functions).estimate_freq
-
-        estimator_list = self.__create_fragment_estimators(alpha_list, index_list)
-
+        fragment_estimators = self.__create_fragment_estimators(alpha_list, index_list)
         D = []
-        fragments = []
-        frequency_dict = defaultdict(lambda: HeavyHitterList(self.threshold))
 
-        fragments = self.__generate_possible_fragments(alphabet)
+        start = time.process_time()
+        fragments = self.__generate_fragments(alphabet)
+        print("Fragments Generated:", time.process_time() - start)
 
-        for i in range(0, 256):
-            for fragment in fragments:
-                fragment = str(i) + "_" + str(fragment)
-                for estimator in estimator_list.items():
-                    fragment_freq_pair = fragment, estimator[1](fragment)
-                    frequency_dict[estimator[0]].append(fragment_freq_pair)
+        frequency_dict = defaultdict(lambda: Counter())
+
+        # Computationally checking the frequency estimates of every possible fragment is slow
+            # We use python multithreading to make this quicker
+            # We use the pathos library since the standard multiprocessing library doesn't allow pool maps in class methods
+
+        start = time.time()
+        pool = pp.ProcessPool()
+
+        def estimate_fragments(key, frag_estimator):
+            frag_dict = dict()
+
+            for frag in fragments:
+                frag_dict[frag] = frag_estimator(frag)
+
+            return key, Counter(frag_dict)
+
+        # estimate_fragments = lambda key, frag_estimator: (key, Counter({k:v for k,v in map(lambda x: (x, frag_estimator(x)), fragments)}))
+
+        pool_map = pool.uimap(estimate_fragments, fragment_estimators.keys(), fragment_estimators.values())
+
+        for item in pool_map:
+            frequency_dict[item[0]] = item[1]
+
+        print("Fragments Tested:", time.time() - start)
 
         hash_table = defaultdict(lambda: defaultdict(list))
 
         fragment_indices = np.arange(0, self.max_string_length, step=self.fragment_length)
 
         for l in fragment_indices:
-            fragments, frequencies = zip(*frequency_dict.get(l).get_data())
+            fragments = frequency_dict.get(l).most_common(self.threshold)
             for fragment in fragments:
-                key, value = self.__split_fragment(fragment)
+                key, value = self.__split_fragment(fragment[0])
                 hash_table[key][l].append(value)
 
-        print(hash_table.values())
         for dictionary in hash_table.values():
             fragment_list = list(dictionary.values())
 
