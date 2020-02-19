@@ -18,29 +18,27 @@ from simulations.heavy_hitters.helpers.SuccinctHistSimulation import SuccinctHis
 from simulations.heavy_hitters.helpers.BitstogramSimulation import BitstogramSimulation
 
 class NLTKSimulation:
-    def __init__(self, word_sample_size):
+    def __init__(self, sample_size):
         self.experiment_plot_data = []
         self.alphabet = []
-        self.word_length = 0
-        self.word_sample_size = word_sample_size
+        self.max_string_length = 0
+        self.sample_size = sample_size
         self.data = self._generate_dataset()
 
     def _generate_dataset(self):
         word = nltk.FreqDist(dependency_treebank.words())
 
         freq_dataset = word.most_common(30)
-        print(freq_dataset)
         freq_dataset = freq_dataset[29:10:-1]
-        print(freq_dataset)
 
         dataset = []
         alphabet = set()
-        word_length = 0
+        max_string_length = 0
 
         for pair in freq_dataset:
             dataset += [pair[0]] * pair[1]
-            if len(pair[0]) > word_length:
-                word_length = len(pair[0])
+            if len(pair[0]) > max_string_length:
+                max_string_length = len(pair[0])
 
             for char in pair[0]:
                 alphabet.add(char)
@@ -51,11 +49,10 @@ class NLTKSimulation:
 
         self.alphabet = alphabet
 
-        if word_length % 2 != 0:
-            word_length = word_length +1
+        if max_string_length % 2 != 0:
+            max_string_length = max_string_length +1
 
-        self.word_length = word_length
-        print(self.word_length)
+        self.max_string_length = max_string_length
         print("Length of dataset is", len(dataset))
         print(alphabet)
         return dataset
@@ -68,14 +65,16 @@ class NLTKSimulation:
             experiment_output = self._run_experiment(experiment_name, params)
             self.experiment_plot_data.append((experiment_list[i], experiment_output))
 
-    def helper(self, parameters):
+    def update_parameters(self, parameters):
         parameters["alphabet"] = self.alphabet
-        parameters["max_string_length"] = self.word_length
-        return SFPSimulation(parameters)
+        parameters["max_string_length"] = self.max_string_length
+        return parameters
 
     def _run_experiment(self, experiment_name, params):
+        params = self.update_parameters(params)
+        print(params)
         heavy_hitters = {
-            "sfp": lambda parameters: self.helper(parameters),
+            "sfp": lambda parameters: SFPSimulation(parameters),
             "treehistogram": lambda parameters: TreeHistogramSimulation(parameters),
             "succincthist": lambda parameters: SuccinctHistSimulation(parameters),
             "bitstogram": lambda parameters: BitstogramSimulation(parameters)
