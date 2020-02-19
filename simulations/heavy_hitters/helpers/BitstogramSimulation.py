@@ -7,7 +7,7 @@ class BitstogramSimulation:
         self.epsilon = params["epsilon"]
         self.R = params["R"]
         self.T = params["T"]
-        self.word_length = params["word_length"]
+        self.word_length = params["max_string_length"]
 
     def run(self, data):
         h = cms_helper.generate_hash_funcs(self.R, self.T)

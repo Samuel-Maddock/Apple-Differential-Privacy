@@ -7,10 +7,9 @@ from algorithms.bnst_ldp.Bitstogram.Hashtogram import Hashtogram
 from collections import Counter
 from reedsolo import RSCodec
 from bitstring import BitArray
-
-
+ 
 class Bitstogram:
-    def __init__(self, dataset, hash_family, T, binary_domain_size, epsilon):
+    def __init__(self, dataset, hash_family, T, word_length, epsilon):
         self.epsilon = epsilon
         self.prob = 1 / ((math.e ** epsilon) + 1)
         self.n = len(dataset)
@@ -18,15 +17,31 @@ class Bitstogram:
         self.R = len(hash_family)
         self.dataset = dataset
         self.hash_family = hash_family
-        self.binary_domain_size = binary_domain_size
+
+        ecc_bytes = 2
+        self.max_string_length = word_length
+        self.binary_domain_size = 8*(self.max_string_length + ecc_bytes)
+        self.rs = RSCodec(ecc_bytes)
         self.partition = self.__generate_partition()
-        #self.rs = RSCodec()
+
+        self.padding_char = "*"
 
         # Constructing randomised dataset
         c = {}
         for j in range(0, self.n):
-            c[j] = BitArray(bytes=bytes(dataset[j], "UTF-8")).bin
-            #c[j] = BitArray(bytes=self.rs.encode(dataset[j])).bin # Store binary string so we can sample bits
+            data = dataset[j]
+
+            # Pad strings that are smaller than some arbitrary max value
+            if len(data) < self.max_string_length:
+                data += (self.max_string_length - len(data)) * self.padding_char
+            elif len(data) > self.max_string_length:
+                data = data[0:self.max_string_length]
+
+            encoded_data = self.rs.encode(data)
+            c[j] = BitArray(bytes=encoded_data).bin # Store binary string so we can sample bits
+            #c[j] = BitArray(bytes=bytes(dataset[j], "UTF-8")).bin
+            if j == 0:
+                print(len(c[j]))
         self.c = c
 
         S = np.zeros([self.R, self.binary_domain_size]).astype(np.object)
@@ -61,10 +76,10 @@ class Bitstogram:
         histograms = np.zeros([self.R, self.binary_domain_size]).astype(np.object)
         for r in range(0, self.R):
             for l in range(0, self.binary_domain_size):
-                histograms[r][l] = Hashtogram(self.S[r, l], self.hash_family, self.T, self.epsilon / 2)
+                histograms[r][l] = Hashtogram(self.S[r, l], self.hash_family, self.T, self.epsilon/2)
 
         # Build up heavy-hitters over all partitions
-        heavy_hitters = []
+        heavy_hitters = set()
         for r in range(0, self.R):
             for t in range(0, self.T):
                 # Build up the heavy hitter for a specific partition bit by bit
@@ -78,35 +93,19 @@ class Bitstogram:
                         v = v + "1"
 
                 try:
-                    #heavy_hitters.append(self.rs.decode(BitArray(bin=v).tobytes()))  # Decode the error correcting code
-                    heavy_hitters.append(str(BitArray(bin=v).tobytes(), "UTF-8"))
+                    v_bytes = self.rs.decode(BitArray(bin=v).tobytes()) # Decode the error correcting code
+                    heavy_hitters.add(v_bytes.decode("utf-8"))
                 except:
                     pass
 
         # Obtain a frequency oracle for the whole dataset
         hist = Hashtogram(self.dataset, self.hash_family, self.T, self.epsilon / 2)
-
+        heavy_hitter_list = []
+        print(heavy_hitter_list)
         # Return the heavy-hitters and their estimated frequencies
-        return list(map(lambda x: (x, hist.freq_oracle(x)), heavy_hitters))  # Output heavy hitters + freq estimation
+        for hitter in heavy_hitters:
+            freq = hist.freq_oracle(hitter)
+            if freq > math.sqrt(self.n):
+                heavy_hitter_list.append((hitter, freq))
 
-
-# Synthetic data
-data1 = ["1011"] * 10000
-data2 = ["1111"] * 8000
-data3 = ["1000"] * 300
-
-data = np.concatenate((data1,data2,data3))
-
-# We use T = 2, d = 10, epsilon = 1
-    # Our threshold is 2, since our original dataset only contains 3 unique elements
-
-T = 10
-R = 10
-epsilon = 1
-
-h = cms_helper.generate_hash_funcs(R, T)
-heavy_hitters = Bitstogram(data, h, T, 32, epsilon)
-
-heavy_hitter_list = heavy_hitters.find_heavy_hitters()
-
-print(heavy_hitter_list)
+        return heavy_hitter_list  # Output heavy hitters + freq estimation
