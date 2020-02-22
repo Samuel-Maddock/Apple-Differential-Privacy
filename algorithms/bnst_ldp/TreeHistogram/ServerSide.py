@@ -51,7 +51,7 @@ class TreeHistogram:
         priv_frequency = [0] * len(word_frequency)
         priv_error = [0] * len(word_frequency)
         for i, word in enumerate(word_frequency['word']):
-            priv_frequency[i] = int(priv_count_sketch.get_freq_estimate(word))
+            priv_frequency[i] = int(priv_count_sketch.freq_oracle(word))
             priv_error[i] = int(priv_frequency[i] - word_frequency['trueFrequency'][i])
 
         word_frequency['privateFreq_run_freq'] = priv_frequency
@@ -95,7 +95,7 @@ class TreeHistogram:
         while word_queue.__len__() != 0:
             current_prefix = word_queue.popleft()
             current_prefix_after_stripping_empty = current_prefix.replace(self.empty_char, '')
-            freq_for_current_prefix = int(priv_count_sketch.get_freq_estimate(current_prefix))
+            freq_for_current_prefix = int(priv_count_sketch.freq_oracle(current_prefix))
 
             if freq_for_current_prefix < self.threshold:
                 continue
@@ -135,7 +135,7 @@ class TreeHistogram:
         # Reapproximate frequencies based on the minimum of the estimates of fragment frequency vs whole dataset frequenc
         heavy_hitters = {}
         for key, value in noisy_frequencies.items():
-            freq = main_count_sketch.get_freq_estimate(key)
+            freq = main_count_sketch.freq_oracle(key)
             if min(value,freq) >= 0:
                 heavy_hitters[key] = max(value,freq)
 

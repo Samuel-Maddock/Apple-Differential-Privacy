@@ -25,28 +25,50 @@ class SFPSimulation(HeavyHitterSimulation):
         self.fragment_length = params.get("fragment_length")
         self.max_string_length = params.get("max_string_length")
 
+        if params.get("freq_oracle") is not None or params.get("freq_oracle_params") is not None:
+            self.freq_oracle = params.get("freq_oracle")
+            self.freq_oracle_params = params.get("freq_oracle_params")
+        else:
+            self.freq_oracle = "cms"
+            self.freq_oracle_params = {}
+
     def run(self, data):
         # -------------------- Simulating the client-side process --------------------
 
         sfp_data = []
 
-        hash_families = cms_helper.generate_hash_funcs(self.k, self.m), cms_helper.generate_hash_funcs(self.k_prime, self.m_prime)
+        hash_families = cms_helper.generate_hash_funcs(self.k, self.m), cms_helper.generate_hash_funcs(self.k_prime,
+                                                                                                       self.m_prime)
         client_cms_parameters = [(self.epsilon, self.m), (self.epsilon_prime, self.m_prime)]
-        client_sfp = ClientSFP(client_cms_parameters, hash_families, cms_helper.generate_256_hash(), fragment_length=self.fragment_length, max_string_length=self.max_string_length)
+        client_sfp = ClientSFP(client_cms_parameters, hash_families, cms_helper.generate_256_hash(),
+                               fragment_length=self.fragment_length, max_string_length=self.max_string_length)
 
-        for word in data:
-            sfp_data.append(client_sfp.fragment(word))  # Client_SFP the word and add it to the sfp_data
+        server_cms_parameters = [(self.epsilon, self.k, self.m), (self.epsilon_prime, self.k_prime, self.m_prime)]
+
+        server_sfp = ServerSFP(server_cms_parameters, hash_families, self.threshold,
+                               fragment_length=self.fragment_length,
+                               max_string_length=self.max_string_length)
+
+        if self.freq_oracle == "cms":
+            for item in data:
+                sfp_data.append(client_sfp.fragment(item))
+
+            word_estimator, fragment_estimator = server_sfp.generate_cms_estimators(sfp_data)
+        else:
+            word_estimator, fragment_estimator = client_sfp.fragment_with_oracle(data, self.freq_oracle,
+                                                                                 self.freq_oracle_params)
 
         # -------------------- Simulating the server-side process --------------------
-        cms_parameters = [(self.epsilon, self.k, self.m), (self.epsilon_prime, self.k_prime, self.m_prime)]
-        server_sfp = ServerSFP(cms_parameters, hash_families, self.threshold, fragment_length=self.fragment_length, max_string_length=self.max_string_length)
-        D, freq_oracle, padding_char = server_sfp.generate_frequencies(sfp_data, self.alphabet)
+
+        D, freq_oracle, padding_char = server_sfp.generate_frequencies(word_estimator, fragment_estimator,
+                                                                       self.alphabet)
 
         sfp_freq_data = HeavyHitterList(len(D))
 
         for i in range(0, len(D)):
-            if (freq_oracle(D[i]) >= math.sqrt(len(data))):
-                sfp_freq_data.append((D[i].split(padding_char)[0], freq_oracle(D[i])))
+            word = D[i].split(padding_char)[0]
+            freq = freq_oracle(word)
+            if freq >= math.sqrt(len(data)):
+                sfp_freq_data.append((word, freq))
 
         return sfp_freq_data.get_data()
-

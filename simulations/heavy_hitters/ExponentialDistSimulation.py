@@ -115,6 +115,10 @@ class ExponentialDistSimulation:
             ax.set_xlabel("Words Discovered")
             ax.set_ylabel("Estimated Word Count")
 
+            freq_oracle = "CMS"
+            if experiment_name == "sfp" and experiment_params.get("freq_oracle") is not None:
+                experiment_name = experiment_name + " with " + experiment_params["freq_oracle"]
+
             ax.set_title(
                 "Discovered words and their estimated frequencies \n Experiment: " + experiment_name)
                 #+ "\n Parameters: " + str(experiment_params) )
