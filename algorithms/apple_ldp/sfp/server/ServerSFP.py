@@ -49,17 +49,24 @@ class ServerSFP:
     def __generate_fragments(self, alphabet):
         fragment_arr = itertools.product(alphabet, repeat=self.fragment_length)
         fragment_arr = map(lambda x: "".join(x), fragment_arr)
-        fragment_arr = itertools.product(map(str, range(0,256)), "_", fragment_arr)
+        fragment_arr = itertools.product(map(str, range(0, 256)), "_", fragment_arr)
         return list(map(lambda x: "".join(x), fragment_arr))
 
-    def generate_frequencies(self, sfp_data, alphabet):
-        alphabet.add(self.padding_char)
-
+    def generate_cms_estimators(self, sfp_data):
         alpha_list, beta_list, index_list = list(zip(*sfp_data))
         word_sketch_generator = SketchGenerator(*self.word_parameters)
         M = word_sketch_generator.create_cms_sketch(beta_list)
-        freq_oracle = ServerCMS(M, self.word_hash_functions).estimate_freq
+        word_estimator = ServerCMS(M, self.word_hash_functions).estimate_freq
         fragment_estimators = self.__create_fragment_estimators(alpha_list, index_list)
+
+        return word_estimator, fragment_estimators
+
+    def generate_frequencies(self, word_estimator, fragment_estimators, alphabet):
+        alphabet.add(self.padding_char)
+
+        freq_oracle = word_estimator
+        fragment_estimators = fragment_estimators
+
         D = []
 
         start = time.process_time()
@@ -69,8 +76,8 @@ class ServerSFP:
         frequency_dict = defaultdict(lambda: Counter())
 
         # Computationally checking the frequency estimates of every possible fragment is slow
-            # We use python multithreading to make this quicker
-            # We use the pathos library since the standard multiprocessing library doesn't allow pool maps in class methods
+        # We use python multithreading to make this quicker
+        # We use the pathos library since the standard multiprocessing library doesn't allow pool maps in class methods
 
         start = time.time()
         pool = pp.ProcessPool()
@@ -105,7 +112,7 @@ class ServerSFP:
         for dictionary in hash_table.values():
             fragment_list = list(dictionary.values())
 
-            if len(dictionary.keys()) == self.max_string_length/self.fragment_length:
+            if len(dictionary.keys()) == self.max_string_length / self.fragment_length:
                 D += list(map(lambda x: str().join(x), itertools.product(*fragment_list)))
 
         return D, freq_oracle, self.padding_char

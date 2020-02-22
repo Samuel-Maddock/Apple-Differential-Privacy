@@ -47,7 +47,6 @@ class ClientSFP:
             oracle = "cms"
 
         freq_oracles = {
-            "rappor": "a",
             "priv_count_sketch": lambda dataset: PrivateCountSketch(**params, data=data),
             "priv_count_sketch_median": lambda dataset: PrivateCountSketch(**params, data=data, use_median=True),
             "explicithist": lambda dataset: ExplicitHist(dataset, **params),
