@@ -6,6 +6,7 @@ import math
 class ExplicitHist:
     # The ExplicitHist algorithm requires us to set values of our matrix by using the value of the data to be privatised as an index
     # To get around this for non-integer data, we use an index_map, which takes a data element and produces an index of the matrix
+        # Typically we use a hash function to do this
 
     def __init__(self, dataset, domain_size, epsilon, index_map=lambda x: x):
         self.epsilon = epsilon

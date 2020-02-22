@@ -12,12 +12,16 @@ import math
 
 
 class PrivateCountSketch:
-    def __init__(self, l, w, epsilon, use_median=False):
+    def __init__(self, l, w, epsilon, use_median=False, data=None):
         self.l = l
         self.w = w
         self.epsilon = epsilon
         self.sketch_matrix = np.zeros((l, w))
         self.use_median = use_median
+
+        if data is not None:
+            for item in data:
+                self.set_sketch_element(item)
 
     @staticmethod
     def get_sha256_hash_arr(hashId, dataString):
@@ -54,7 +58,7 @@ class PrivateCountSketch:
     def read_sketch(self, sketch_location):
         self.sketch_matrix = np.load(sketch_location)
 
-    def get_freq_estimate(self, data):
+    def freq_oracle(self, data):
         assert (isinstance(data, str) is True), 'Data should be a string'
 
         weak_freq_estimates = np.zeros(self.l)

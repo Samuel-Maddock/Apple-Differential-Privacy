@@ -29,7 +29,7 @@ class PCSSimulation:
 
         # Generate both frequency data from the oracle and plot data to be graphed
         for i, item in enumerate(domain):
-            ldp_freq[i] = priv_count_sketch.get_freq_estimate(str(item)) # Freq Oracle
+            ldp_freq[i] = priv_count_sketch.freq_oracle(str(item)) # Freq Oracle
             ldp_plot_data = np.append(ldp_plot_data, [item]*int(round(ldp_freq[i]))) # Generate estimated dataset
 
         return ldp_plot_data
