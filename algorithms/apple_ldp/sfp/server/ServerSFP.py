@@ -38,7 +38,7 @@ class ServerSFP:
         for l in range(0, self.max_string_length):
             if dict_vals.get(l) is not None:
                 M = SketchGenerator(*self.fragment_parameters).create_cms_sketch(dict_vals.get(l))
-                estimator_dict[l] = ServerCMS(M, self.fragment_hash_functions).estimate_freq
+                estimator_dict[l] = ServerCMS(M, self.fragment_hash_functions).freq_oracle
 
         return estimator_dict
 
@@ -56,7 +56,7 @@ class ServerSFP:
         alpha_list, beta_list, index_list = list(zip(*sfp_data))
         word_sketch_generator = SketchGenerator(*self.word_parameters)
         M = word_sketch_generator.create_cms_sketch(beta_list)
-        word_estimator = ServerCMS(M, self.word_hash_functions).estimate_freq
+        word_estimator = ServerCMS(M, self.word_hash_functions).freq_oracle
         fragment_estimators = self.__create_fragment_estimators(alpha_list, index_list)
 
         return word_estimator, fragment_estimators

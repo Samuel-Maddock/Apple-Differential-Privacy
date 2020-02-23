@@ -3,7 +3,7 @@ class ServerCMS:
         self.sketch_matrix = sketch_matrix
         self.hash_funcs = hash_funcs
 
-    def estimate_freq(self, data):
+    def freq_oracle(self, data):
         k, m = self.sketch_matrix.shape
         n = len(self.hash_funcs)
         freq_sum = 0

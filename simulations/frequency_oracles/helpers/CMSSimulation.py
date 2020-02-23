@@ -51,7 +51,7 @@ class CMSSimulation:
 
         # Generate both frequency data from the oracle and plot data to be graphed
         for i, item in enumerate(domain):
-            ldp_plot_data = np.append(ldp_plot_data, [item]*int(round(server_cms.estimate_freq(item)))) # Generate estimated dataset
+            ldp_plot_data = np.append(ldp_plot_data, [item] * int(round(server_cms.freq_oracle(item)))) # Generate estimated dataset
 
         return ldp_plot_data
 

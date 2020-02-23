@@ -47,7 +47,7 @@ print("Estimating frequencies from sketch matrix...")
 ldp_freq = np.empty(len(bins))
 ldp_plot_data = np.empty(len(bins))
 for key in bins:
-    ldp_freq[key-1] = server_cms.estimate_freq(key)
+    ldp_freq[key-1] = server_cms.freq_oracle(key)
     ldp_plot_data = np.append(ldp_plot_data, [key]*int(ldp_freq[key-1]))
 
 # -------------------- Calculating Error --------------------
