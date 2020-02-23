@@ -1,7 +1,6 @@
 import numpy as np
 
 from algorithms.apple_ldp.cms.client.ClientCMS import ClientCMS
-from algorithms.apple_ldp.cms.server.SketchGenerator import SketchGenerator
 from algorithms.apple_ldp.cms.server.ServerCMS import ServerCMS
 from algorithms.apple_ldp.cms.CMSHelper import cms_helper
 from collections import Counter
@@ -25,7 +24,6 @@ class CMSSimulation:
         client_cms = ClientCMS(self.epsilon, hash_funcs, self.m)
         print("CMS Initialised:", time.process_time() - start)
 
-        sketch_generator = SketchGenerator(self.epsilon, self.k, self.m)
         print("Sampling data from the clients...")
 
         for i in range(0, len(data)):
@@ -38,14 +36,9 @@ class CMSSimulation:
         # -------------------- Simulating the server-side process --------------------
 
         # Create a sketch matrix of the ldp data
-        if self.is_hcms:
-            M = sketch_generator.create_hcms_sketch(ldp_data)
-        else:
-            M = sketch_generator.create_cms_sketch(ldp_data)
-
+        server_cms = ServerCMS(ldp_data, self.epsilon, self.k, self.m, hash_funcs, is_hadamard=self.is_hcms) # Initialise the frequency oracle
+        
         print("Sketch Generated:", time.process_time() - start)
-        server_cms = ServerCMS(M, hash_funcs) # Initialise the frequency oracle
-
         print("Estimating frequencies from sketch matrix...")
         ldp_plot_data = np.empty(len(domain))
 

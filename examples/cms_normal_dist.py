@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from algorithms.apple_ldp.cms.client.ClientCMS import ClientCMS
-from algorithms.apple_ldp.cms.server.SketchGenerator import SketchGenerator
 from algorithms.apple_ldp.cms.server.ServerCMS import ServerCMS
 from algorithms.apple_ldp.cms.CMSHelper import cms_helper
 from collections import Counter
@@ -39,9 +38,7 @@ for i in range(0,N):
 
 # -------------------- Simulating the server-side process --------------------
 
-M = sketch_generator.create_cms_sketch(ldp_data)
-
-server_cms = ServerCMS(M, hash_funcs)
+server_cms = ServerCMS(ldp_data, k, m, epsilon, hash_funcs)
 
 print("Estimating frequencies from sketch matrix...")
 ldp_freq = np.empty(len(bins))
