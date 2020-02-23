@@ -10,8 +10,12 @@ from simulations.heavy_hitters.helpers.TreehistogramSimulation import TreeHistog
 from simulations.heavy_hitters.helpers.SuccinctHistSimulation import SuccinctHistSimulation
 from simulations.heavy_hitters.helpers.BitstogramSimulation import BitstogramSimulation
 
-class ExponentialDistSimulation:
+from simulations.heavy_hitters.helpers.HeavyHitterSimulation import HeavyHitterSimulation
+
+
+class ExponentialDistSimulation(HeavyHitterSimulation):
     def __init__(self, n, p, alphabet, word_length, word_sample_size):
+        super().__init__()
         self.n = n
         self.p = p
         self.alphabet = alphabet
@@ -66,10 +70,10 @@ class ExponentialDistSimulation:
 
         return heavy_hitters.get(experiment_name, "error")(params).run(self.data)  # TODO: Provide error handling
 
-    def  _generate_palette(self, color_palette, x1, x2):
+    def _generate_palette(self, color_palette, x1, x2):
         # Generate colour palette for a graph of heavy hitter data
         # We color bars of words that were discovered by the algo but were not in our original dataset as red
-            # We maintain the original coloring of the words that were correctly discovered
+        # We maintain the original coloring of the words that were correctly discovered
 
         palette = []
         for data in list(x2):
@@ -83,8 +87,8 @@ class ExponentialDistSimulation:
         freq_data = Counter(self.data)
         print("Plotting results...")
 
-        figsize = (len(self.experiment_plot_data)*6, len(self.experiment_plot_data)*6)
-        fig, axs = plt.subplots(len(self.experiment_plot_data)+1, figsize=figsize)
+        figsize = (len(self.experiment_plot_data) * 6, len(self.experiment_plot_data) * 6)
+        fig, axs = plt.subplots(len(self.experiment_plot_data) + 1, figsize=figsize)
         ax1 = axs[0]
 
         # Plots the words and their frequencies in descending order
@@ -101,7 +105,7 @@ class ExponentialDistSimulation:
             experiment_params = plot_data[0][1]
             heavy_hitter_data = plot_data[1]
 
-            ax = axs[i+1]
+            ax = axs[i + 1]
 
             if len(heavy_hitter_data) == 0:
                 heavy_hitter_data.add(("empty", 0))
@@ -115,14 +119,12 @@ class ExponentialDistSimulation:
             ax.set_xlabel("Words Discovered")
             ax.set_ylabel("Estimated Word Count")
 
-            freq_oracle = "CMS"
-            if experiment_name == "sfp" and experiment_params.get("freq_oracle") is not None:
+            if experiment_params.get("freq_oracle") is not None:
                 experiment_name = experiment_name + " with " + experiment_params["freq_oracle"]
 
             ax.set_title(
                 "Discovered words and their estimated frequencies \n Experiment: " + experiment_name)
-                #+ "\n Parameters: " + str(experiment_params) )
-
+            # + "\n Parameters: " + str(experiment_params) )
 
         fig.tight_layout()
 
