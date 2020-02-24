@@ -2,13 +2,25 @@ import math
 from scipy.linalg import hadamard
 import numpy as np
 
+from algorithms.apple_ldp.cms.client.ClientCMS import ClientCMS
 
 class ServerCMS:
-    def __init__(self, dataset, epsilon, k, m, hash_funcs, is_hadamard=False):
+    def __init__(self, dataset, epsilon, k, m, hash_funcs, is_hadamard=False, is_raw_data=False):
         self.k = k
         self.m = m
         self.epsilon = epsilon
+        self.hash_funcs = hash_funcs
         self.c = (math.pow(math.e, epsilon / 2) + 1) / (math.pow(math.e, epsilon / 2) - 1)
+
+        # If the data is not privatised then we use client CMS/HCMS to privatise it
+            # This wouldn't be used in practice, and is just a helper for simulations
+        if is_raw_data:
+            client_cms = ClientCMS(self.epsilon, self.hash_funcs, m)
+            if is_hadamard:
+                dataset = list(map(client_cms.client_hcms, dataset))
+            else:
+                dataset = list(map(client_cms.client_cms, dataset))
+
         self.sketch_matrix = self.create_cms_sketch(dataset) if not is_hadamard else self.create_hcms_sketch(dataset)
         self.hash_funcs = hash_funcs
 
