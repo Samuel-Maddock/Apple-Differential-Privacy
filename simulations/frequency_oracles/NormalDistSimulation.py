@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import uuid
 import os
+import pandas as pd
 
 from simulations.frequency_oracles.helpers.CMSSimulation import CMSSimulation
 from simulations.frequency_oracles.helpers.PCSSimulation import PCSSimulation
@@ -24,8 +25,10 @@ class NormalDistSimulation:
             experiment_name = experiment_list[i][0]
             params = experiment_list[i][1]
 
-            experiment_output = self._run_experiment(experiment_name, params)
-            self.experiment_plot_data.append((experiment_list[i], experiment_output))
+            print("Running experiment", i, ":", experiment_name, "with params: \n", params.__str__())
+
+            experiment, experiment_output = self._run_experiment(experiment_name, params)
+            self.experiment_plot_data.append((experiment_list[i], experiment_output, experiment))
 
     def _run_experiment(self, experiment_name, params):
 
@@ -40,7 +43,12 @@ class NormalDistSimulation:
             "hashtogram_median": lambda parameters: HashtogramSimulation(parameters, use_median=True)
         }
 
-        return freq_oracles.get(experiment_name, "error")(params).run(self.data, self.bins) # TODO: Provide error handling
+        if experiment_name not in freq_oracles.keys():
+            assert "experiment name must be one of: ", freq_oracles.keys()
+
+        experiment = freq_oracles.get(experiment_name)(params)
+
+        return experiment, experiment.run(self.data, self.bins)
 
     def _plot(self):
         bins = np.arange(start=min(self.data), stop=max(self.data) + 1)
@@ -56,10 +64,15 @@ class NormalDistSimulation:
             "Integer data sampled from a Normal distribution \n $N=${}, sampled from $N({}, {})$".format(self.n,
                                                                                                          self.mu,
                                                                                                          self.sd * self.sd))
+
+        row_list = []
         for i, ldp_plot_data in enumerate(self.experiment_plot_data):
             experiment_name = ldp_plot_data[0][0]
             experiment_params = ldp_plot_data[0][1]
             experiment_data = ldp_plot_data[1]
+            experiment = ldp_plot_data[2]
+
+            row_list.append(experiment.generate_stats(self.data, experiment_data, self.bins))
 
             # Plotting a distplot of the data produced from the experiment
             sns.distplot(experiment_data, bins=bins, ax=axs[i + 1], color=colours[i+1], hist_kws={'ec': "black"})
@@ -82,6 +95,10 @@ class NormalDistSimulation:
         filename = "plots/" + "normal_exp" + str(uuid.uuid4()) + ".png"
 
         plt.savefig(filename)
+
+        stats = pd.DataFrame(row_list)
+        print(stats)
+
         plt.show()
         print("Plot Displayed...")
 

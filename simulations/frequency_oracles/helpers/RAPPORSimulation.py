@@ -3,15 +3,20 @@ import numpy as np
 from algorithms.google_ldp.rappor.server.RAPPORServer import RAPPORServer
 from collections import Counter
 
+from simulations.frequency_oracles.helpers.FrequencyOracleSimulation import FrequencyOracleSimulation
 
-class RAPPORSimulation:
+
+class RAPPORSimulation(FrequencyOracleSimulation):
     def __init__(self, params):
+        super().__init__()
         self.num_bloombits = params["num_bloombits"]
         self.num_hashes = params["num_hashes"]
         self.num_of_cohorts = params["num_of_cohorts"]
         self.prob_p = params["prob_p"]
         self.prob_q = params["prob_q"]
         self.prob_f = params["prob_f"]
+
+        self.name = "RAPPOR"
 
     def run(self, data, domain):
         # -------------------- Simulating the client and server-side process --------------------
@@ -33,23 +38,3 @@ class RAPPORSimulation:
             ldp_plot_data = np.append(ldp_plot_data, [int(row[0])] * int(row[1]))
 
         return ldp_plot_data
-
-    def calculate_error(self, data, ldp_plot_data, domain):
-        original_freq_data = dict(Counter(data.tolist()))
-        ldp_freq_data = dict(Counter(ldp_plot_data.tolist()))
-
-        max_error = 0
-        avg_error = 0
-        max_bin = 0
-
-        for item in domain:
-            error = abs(ldp_freq_data.get(item, 0) - original_freq_data.get(item, 0))
-            if max_error < error:
-                max_error = error
-                max_item = item
-            avg_error += error
-
-        avg_error = avg_error / len(domain)
-
-        print("Average Error: " + str(avg_error))
-        print("Max Error: " + str(max_error) + " occurs at bin " + str(max_bin))
