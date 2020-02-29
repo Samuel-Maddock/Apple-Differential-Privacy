@@ -18,8 +18,9 @@ class FrequencyOracleSimulation:
         original_freq_data = dict(Counter(data.tolist()))
         ldp_freq_data = dict(Counter(ldp_data.tolist()))
 
+        mse = 0
         max_error = 0
-        avg_error = 0
+        total_error = 0
         max_item = ""
 
         for item in domain:
@@ -27,17 +28,20 @@ class FrequencyOracleSimulation:
             if max_error < error:
                 max_error = error
                 max_item = item
-            avg_error += error
+            total_error += error
+            mse += error**2
 
-        avg_error = avg_error / len(domain)
+        avg_error = total_error / len(domain)
+        mse = mse / len(domain)
 
-        return max_error, max_item, avg_error
+        return max_error, max_item, avg_error, mse
 
     def generate_stats(self, data, ldp_data, domain):
         row = OrderedDict()
-        max_error, max_item, avg_error = self.__calculate_error(data, ldp_data, domain)
+        max_error, max_item, avg_error, mse = self.__calculate_error(data, ldp_data, domain)
 
         row["freq_oracle"] = self.name
+        row["mse"] = mse
         row["average_error"] = avg_error
         row["max_error"] = max_error
         row["max_item"] = max_item

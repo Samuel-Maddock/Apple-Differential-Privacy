@@ -11,6 +11,7 @@ from simulations.frequency_oracles.helpers.RAPPORSimulation import RAPPORSimulat
 from simulations.frequency_oracles.helpers.HashtogramSimulation import HashtogramSimulation
 from simulations.frequency_oracles.helpers.ExplicitHistSimulation import ExplicitHistSimulation
 
+
 class NormalDistSimulation:
     def __init__(self, n, mu, sd):
         self.n = n
@@ -25,7 +26,7 @@ class NormalDistSimulation:
             experiment_name = experiment_list[i][0]
             params = experiment_list[i][1]
 
-            print("Running experiment", i, ":", experiment_name, "with params: \n", params.__str__())
+            print("Running experiment", i + 1, ":", experiment_name, "with params: \n", params.__str__(), "\n")
 
             experiment, experiment_output = self._run_experiment(experiment_name, params)
             self.experiment_plot_data.append((experiment_list[i], experiment_output, experiment))
@@ -53,10 +54,10 @@ class NormalDistSimulation:
     def _plot(self):
         bins = np.arange(start=min(self.data), stop=max(self.data) + 1)
 
-        figsize = (len(self.experiment_plot_data)*7, len(self.experiment_plot_data)*7)
+        figsize = (len(self.experiment_plot_data) * 7, len(self.experiment_plot_data) * 7)
 
         fig, axs = plt.subplots(len(self.experiment_plot_data) + 2, figsize=figsize)
-        colours = sns.color_palette("hls", len(self.experiment_plot_data) + 1) # Generate colours for each plot
+        colours = sns.color_palette("hls", len(self.experiment_plot_data) + 1)  # Generate colours for each plot
 
         # Plotting a distplot of our integer data sampled from a normal dist
         sns.distplot(self.data, bins=bins, ax=axs[0], hist_kws={'ec': "black"}, color=colours[0])
@@ -72,20 +73,23 @@ class NormalDistSimulation:
             experiment_data = ldp_plot_data[1]
             experiment = ldp_plot_data[2]
 
-            row_list.append(experiment.generate_stats(self.data, experiment_data, self.bins))
+            row = experiment.generate_stats(self.data, experiment_data, self.bins)
+            row["params"] = experiment_params.__str__()
+            row_list.append(row)
 
             # Plotting a distplot of the data produced from the experiment
-            sns.distplot(experiment_data, bins=bins, ax=axs[i + 1], color=colours[i+1], hist_kws={'ec': "black"})
-            sns.distplot(self.data, bins=bins, hist=False, ax=axs[i+1], color=colours[0])
+            sns.distplot(experiment_data, bins=bins, ax=axs[i + 1], color=colours[i + 1], hist_kws={'ec': "black"})
+            sns.distplot(self.data, bins=bins, hist=False, ax=axs[i + 1], color=colours[0])
 
-            axs[i+1].set_title(
-                "Differentially private " + experiment_name + " data produced from the normal sample \n Parameters: " + str(experiment_params))
+            axs[i + 1].set_title(
+                "Differentially private " + experiment_name + " data produced from the normal sample \n Parameters: " + str(
+                    experiment_params))
 
             # Plotting the kde from above for comparison in the last axis
-            sns.distplot(experiment_data, hist=False, bins=bins, ax=axs[len(axs)-1], color=colours[i+1])
+            sns.distplot(experiment_data, hist=False, bins=bins, ax=axs[len(axs) - 1], color=colours[i + 1])
 
         # Plot the original kde of the data in the last axis
-        sns.distplot(self.data, bins=bins, hist=False, ax=axs[len(axs)-1], color=colours[0])
+        sns.distplot(self.data, bins=bins, hist=False, ax=axs[len(axs) - 1], color=colours[0])
 
         fig.tight_layout()
 
@@ -96,8 +100,11 @@ class NormalDistSimulation:
 
         plt.savefig(filename)
 
+        pd.set_option('display.max_rows', None)
+        pd.set_option('display.max_columns', None)
+        pd.options.display.width = 0
         stats = pd.DataFrame(row_list)
-        print(stats)
+        print("\n", stats, "\n")
 
         plt.show()
         print("Plot Displayed...")
