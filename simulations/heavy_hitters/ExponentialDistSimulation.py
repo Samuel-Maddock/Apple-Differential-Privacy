@@ -4,6 +4,7 @@ import seaborn as sns
 import uuid
 import os
 import itertools
+import pandas as pd
 from collections import Counter
 
 from simulations.heavy_hitters.helpers.HeavyHitterSimulation import HeavyHitterSimulation
@@ -65,15 +66,21 @@ class ExponentialDistSimulation(HeavyHitterSimulation):
         ax1.set_ylabel("Word Count")
         ax1.set_title("Words and their frequencies in the dataset")
 
+        row_list = []
         for i, plot_data in enumerate(self.experiment_plot_data):
             experiment_name = plot_data[0][0]
             experiment_params = plot_data[0][1]
             heavy_hitter_data = plot_data[1]
+            experiment = plot_data[2]
 
             ax = axs[i + 1]
 
             if len(heavy_hitter_data) == 0:
                 heavy_hitter_data.add(("empty", 0))
+
+            # Generate metrics for this experiment
+            row = super().generate_metrics(freq_data, heavy_hitter_data, self.word_sample_size)
+            row_list.append(row)
 
             x, y = zip(*reversed(heavy_hitter_data))
             palette = self._generate_palette(color_palette, x1, x)
@@ -90,6 +97,15 @@ class ExponentialDistSimulation(HeavyHitterSimulation):
             ax.set_title(
                 "Discovered words and their estimated frequencies \n Experiment: " + experiment_name)
             # + "\n Parameters: " + str(experiment_params) )
+
+
+        pd.set_option('display.max_rows', None)
+        pd.set_option('display.max_columns', None)
+        pd.set_option('display.max_colwidth', -1)
+
+        pd.options.display.width = 0
+        metrics = pd.DataFrame(row_list)
+        print(metrics)
 
         fig.tight_layout()
 

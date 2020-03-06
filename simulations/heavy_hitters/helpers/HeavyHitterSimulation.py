@@ -3,6 +3,7 @@ from simulations.heavy_hitters.helpers.TreehistogramSimulation import TreeHistog
 from simulations.heavy_hitters.helpers.SuccinctHistSimulation import SuccinctHistSimulation
 from simulations.heavy_hitters.helpers.BitstogramSimulation import BitstogramSimulation
 
+from collections import OrderedDict
 
 class HeavyHitterSimulation:
     def __init__(self):
@@ -48,3 +49,25 @@ class HeavyHitterSimulation:
             else:
                 palette.append(color_palette[x1.index(data)])
         return palette
+
+    def generate_metrics(self, original_data, heavy_hitter_data, sample_size):
+        row = OrderedDict()
+
+        heavy_hitter_data = dict(heavy_hitter_data)
+
+        tp = 0
+        avg_freq = 0
+        for word in heavy_hitter_data.keys():
+            if word in original_data.keys():
+                tp += 1
+            else:
+                avg_freq += heavy_hitter_data[word]
+        fp = len(heavy_hitter_data.keys()) - tp
+
+        row["freq_oracle"] = "a"
+        row["recall"] = tp / len(original_data.keys())
+        row["precision"] = tp / len(heavy_hitter_data.keys())
+        row["false_positives"] = fp
+        row["average_freq_of_fp"] = avg_freq/fp if fp != 0 else "NA"
+
+        return row

@@ -5,6 +5,7 @@ import seaborn as sns
 import uuid
 import os
 import itertools
+import pandas as pd
 
 from nltk.corpus import words
 from nltk.corpus import brown
@@ -16,12 +17,12 @@ from simulations.heavy_hitters.helpers.HeavyHitterSimulation import HeavyHitterS
 
 
 class NLTKSimulation(HeavyHitterSimulation):
-    def __init__(self, sample_size):
+    def __init__(self, word_sample_size):
         super().__init__()
         self.experiment_plot_data = []
         self.alphabet = []
         self.max_string_length = 0
-        self.sample_size = sample_size
+        self.word_sample_size = word_sample_size
         self.data = self._generate_dataset()
 
     def _generate_dataset(self):
@@ -79,12 +80,17 @@ class NLTKSimulation(HeavyHitterSimulation):
         ax1.set_ylabel("Word Count")
         ax1.set_title("Words and their frequencies in the dataset")
 
+        row_list = []
         for i, plot_data in enumerate(self.experiment_plot_data):
             experiment_name = plot_data[0][0]
             experiment_params = plot_data[0][1]
             heavy_hitter_data = plot_data[1]
 
             ax = axs[i + 1]
+
+            # Generate metrics for this experiment
+            row = super().generate_metrics(freq_data, heavy_hitter_data, self.word_sample_size)
+            row_list.append(row)
 
             if len(heavy_hitter_data) == 0:
                 heavy_hitter_data.add(("empty", 0))
@@ -101,6 +107,14 @@ class NLTKSimulation(HeavyHitterSimulation):
             ax.set_title(
                 "Discovered words and their estimated frequencies \n Experiment: " + experiment_name)
             # + "\n Parameters: " + str(experiment_params) )
+
+
+        pd.set_option('display.max_rows', None)
+        pd.set_option('display.max_columns', None)
+        pd.set_option('display.max_colwidth', -1)
+
+        pd.options.display.width = 0
+        metrics = pd.DataFrame(row_list)
 
         fig.tight_layout()
 
