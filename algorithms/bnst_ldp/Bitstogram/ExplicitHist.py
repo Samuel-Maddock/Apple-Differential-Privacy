@@ -2,6 +2,8 @@ import numpy as np
 from scipy.linalg import hadamard
 import math
 
+# Used for simulations only
+    # Works only for a fixed known domain of elements
 
 class ExplicitHist:
     # The ExplicitHist algorithm requires us to set values of our matrix by using the value of the data to be privatised as an index
@@ -14,10 +16,6 @@ class ExplicitHist:
         self.n = len(dataset)
         self.d = domain_size
         self.index_map = index_map # The index_map -> See SuccintHist.py and ExplicitHistSimulation.py for examples
-
-        if domain_size is None:
-            domain = set(dataset)
-            self.index_map = lambda x: list(map(str, domain)).index(str(x)) # Index map based on the index of the element in the domain
 
         # Constructing randomised dataset (Step 1 of algorithm 5)
         self.y = [0] * self.n

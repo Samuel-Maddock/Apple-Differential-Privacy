@@ -5,6 +5,7 @@ from collections import defaultdict
 from algorithms.bnst_ldp.Bitstogram.Hashtogram import Hashtogram
 from algorithms.bnst_ldp.Bitstogram.ExplicitHist import ExplicitHist
 from algorithms.bnst_ldp.TreeHistogram.PrivateCountSketch import PrivateCountSketch
+from algorithms.core_ldp.FreqOracle import FreqOracle
 
 class ClientSFP:
     def __init__(self, cms_params, hash_families, hash_256, fragment_length=2, max_string_length=6, padding_char="*"):
@@ -43,13 +44,9 @@ class ClientSFP:
     # Combines client-side + server-side hashtogram to produce estimators for hashtogram SFP
     def fragment_with_oracle(self, data, oracle="", params=None):
 
-        if oracle == "":
-            oracle = "cms"
-
         freq_oracles = {
             "priv_count_sketch": lambda dataset: PrivateCountSketch(**params, data=dataset),
             "priv_count_sketch_median": lambda dataset: PrivateCountSketch(**params, data=dataset, use_median=True),
-            "explicithist": lambda dataset: ExplicitHist(dataset, **params),
             "hashtogram": lambda dataset: Hashtogram(dataset, **params),
             "hashtogram_median": lambda dataset: Hashtogram(dataset, **params, use_median=True)
         }

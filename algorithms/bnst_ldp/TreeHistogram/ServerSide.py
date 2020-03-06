@@ -93,7 +93,6 @@ class TreeHistogram:
             freq_oracles = {
                 "priv_count_sketch": lambda dataset: PrivateCountSketch(**params, data=dataset),
                 "priv_count_sketch_median": lambda dataset: PrivateCountSketch(**params, data=dataset, use_median=True),
-                "explicithist": lambda dataset: ExplicitHist(dataset, **params),
                 "hashtogram": lambda dataset: Hashtogram(dataset, **params),
                 "hashtogram_median": lambda dataset: Hashtogram(dataset, **params, use_median=True),
                 "cms": lambda dataset: ServerCMS(dataset, **params, is_raw_data=True),
