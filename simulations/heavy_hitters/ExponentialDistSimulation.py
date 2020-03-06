@@ -5,10 +5,6 @@ import uuid
 import os
 import itertools
 from collections import Counter
-from simulations.heavy_hitters.helpers.SFPSimulation import SFPSimulation
-from simulations.heavy_hitters.helpers.TreehistogramSimulation import TreeHistogramSimulation
-from simulations.heavy_hitters.helpers.SuccinctHistSimulation import SuccinctHistSimulation
-from simulations.heavy_hitters.helpers.BitstogramSimulation import BitstogramSimulation
 
 from simulations.heavy_hitters.helpers.HeavyHitterSimulation import HeavyHitterSimulation
 
@@ -22,9 +18,9 @@ class ExponentialDistSimulation(HeavyHitterSimulation):
         self.word_length = word_length
         self.word_sample_size = word_sample_size
         self.experiment_plot_data = []
-        self.data = self._generate_dataset()
+        self.data = self.__generate_dataset()
 
-    def _generate_dataset(self):
+    def __generate_dataset(self):
         dataset = []
         alphabet_list = []
 
@@ -52,38 +48,7 @@ class ExponentialDistSimulation(HeavyHitterSimulation):
 
         return dataset
 
-    def _run(self, experiment_list):
-        for i in range(0, len(experiment_list)):
-            experiment_name = experiment_list[i][0]
-            params = experiment_list[i][1]
-
-            experiment_output = self._run_experiment(experiment_name, params)
-            self.experiment_plot_data.append((experiment_list[i], experiment_output))
-
-    def _run_experiment(self, experiment_name, params):
-        heavy_hitters = {
-            "sfp": lambda parameters: SFPSimulation(parameters),
-            "treehistogram": lambda parameters: TreeHistogramSimulation(parameters),
-            "succincthist": lambda parameters: SuccinctHistSimulation(parameters),
-            "bitstogram": lambda parameters: BitstogramSimulation(parameters)
-        }
-
-        return heavy_hitters.get(experiment_name, "error")(params).run(self.data)  # TODO: Provide error handling
-
-    def _generate_palette(self, color_palette, x1, x2):
-        # Generate colour palette for a graph of heavy hitter data
-        # We color bars of words that were discovered by the algo but were not in our original dataset as red
-        # We maintain the original coloring of the words that were correctly discovered
-
-        palette = []
-        for data in list(x2):
-            if data not in list(x1):
-                palette.append("#e74c3c")
-            else:
-                palette.append(color_palette[x1.index(data)])
-        return palette
-
-    def _plot(self):
+    def __plot(self):
         freq_data = Counter(self.data)
         print("Plotting results...")
 
@@ -138,4 +103,4 @@ class ExponentialDistSimulation(HeavyHitterSimulation):
 
     def run_and_plot(self, experiment_list):
         self._run(experiment_list)
-        self._plot()
+        self.__plot()

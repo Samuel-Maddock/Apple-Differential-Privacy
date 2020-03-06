@@ -1,13 +1,9 @@
-
-
 from collections import Counter
 
 from algorithms.bnst_ldp.Bitstogram.SuccinctHist import SuccintHist
 from algorithms.apple_ldp.sfp.HeavyHitterList import HeavyHitterList
-from simulations.heavy_hitters.helpers.HeavyHitterSimulation import HeavyHitterSimulation
 
-
-class SuccinctHistSimulation(HeavyHitterSimulation):
+class SuccinctHistSimulation():
     def __init__(self, params):
         super().__init__()
         self.epsilon = params["epsilon"]

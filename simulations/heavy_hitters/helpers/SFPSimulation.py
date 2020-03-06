@@ -5,12 +5,12 @@ from algorithms.apple_ldp.sfp.client.ClientSFP import ClientSFP
 from algorithms.apple_ldp.cms.CMSHelper import cms_helper
 from algorithms.apple_ldp.sfp.HeavyHitterList import HeavyHitterList
 
-from simulations.heavy_hitters.helpers.HeavyHitterSimulation import HeavyHitterSimulation
+
 import math
 from collections import Counter
 
 
-class SFPSimulation(HeavyHitterSimulation):
+class SFPSimulation():
     def __init__(self, params):
         super().__init__()
         self.epsilon = params["epsilon"]

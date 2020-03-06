@@ -12,13 +12,12 @@ from nltk.corpus import nps_chat
 from nltk.corpus import dependency_treebank
 from collections import Counter
 
-from simulations.heavy_hitters.helpers.SFPSimulation import SFPSimulation
-from simulations.heavy_hitters.helpers.TreehistogramSimulation import TreeHistogramSimulation
-from simulations.heavy_hitters.helpers.SuccinctHistSimulation import SuccinctHistSimulation
-from simulations.heavy_hitters.helpers.BitstogramSimulation import BitstogramSimulation
+from simulations.heavy_hitters.helpers.HeavyHitterSimulation import HeavyHitterSimulation
 
-class NLTKSimulation:
+
+class NLTKSimulation(HeavyHitterSimulation):
     def __init__(self, sample_size):
+        super().__init__()
         self.experiment_plot_data = []
         self.alphabet = []
         self.max_string_length = 0
@@ -50,57 +49,25 @@ class NLTKSimulation:
         self.alphabet = alphabet
 
         if max_string_length % 2 != 0:
-            max_string_length = max_string_length +1
+            max_string_length = max_string_length + 1
 
         self.max_string_length = max_string_length
         print("Length of dataset is", len(dataset))
         print(alphabet)
         return dataset
 
-    def _run(self, experiment_list):
-        for i in range(0, len(experiment_list)):
-            experiment_name = experiment_list[i][0]
-            params = experiment_list[i][1]
-
-            experiment_output = self._run_experiment(experiment_name, params)
-            self.experiment_plot_data.append((experiment_list[i], experiment_output))
-
-    def update_parameters(self, parameters):
-        parameters["alphabet"] = self.alphabet
-        parameters["max_string_length"] = self.max_string_length
-        return parameters
-
     def _run_experiment(self, experiment_name, params):
-        params = self.update_parameters(params)
-        print(params)
-        heavy_hitters = {
-            "sfp": lambda parameters: SFPSimulation(parameters),
-            "treehistogram": lambda parameters: TreeHistogramSimulation(parameters),
-            "succincthist": lambda parameters: SuccinctHistSimulation(parameters),
-            "bitstogram": lambda parameters: BitstogramSimulation(parameters)
-        }
+        params["alphabet"] = self.alphabet
+        params["max_string_length"] = self.max_string_length
 
-        return heavy_hitters.get(experiment_name, "error")(params).run(self.data)  # TODO: Provide error handling
+        super()._run_experiment(experiment_name, params)
 
-    def  _generate_palette(self, color_palette, x1, x2):
-        # Generate colour palette for a graph of heavy hitter data
-        # We color bars of words that were discovered by the algo but were not in our original dataset as red
-            # We maintain the original coloring of the words that were correctly discovered
-
-        palette = []
-        for data in list(x2):
-            if data not in list(x1):
-                palette.append("#e74c3c")
-            else:
-                palette.append(color_palette[x1.index(data)])
-        return palette
-
-    def _plot(self):
+    def __plot(self):
         freq_data = Counter(self.data)
         print("Plotting results...")
 
-        figsize = (len(self.experiment_plot_data)*10, len(self.experiment_plot_data)*10)
-        fig, axs = plt.subplots(len(self.experiment_plot_data)+1, figsize=figsize)
+        figsize = (len(self.experiment_plot_data) * 10, len(self.experiment_plot_data) * 10)
+        fig, axs = plt.subplots(len(self.experiment_plot_data) + 1, figsize=figsize)
         ax1 = axs[0]
 
         # Plots the words and their frequencies in descending order
@@ -117,7 +84,7 @@ class NLTKSimulation:
             experiment_params = plot_data[0][1]
             heavy_hitter_data = plot_data[1]
 
-            ax = axs[i+1]
+            ax = axs[i + 1]
 
             if len(heavy_hitter_data) == 0:
                 heavy_hitter_data.add(("empty", 0))
@@ -133,8 +100,7 @@ class NLTKSimulation:
 
             ax.set_title(
                 "Discovered words and their estimated frequencies \n Experiment: " + experiment_name)
-                #+ "\n Parameters: " + str(experiment_params) )
-
+            # + "\n Parameters: " + str(experiment_params) )
 
         fig.tight_layout()
 
@@ -148,4 +114,4 @@ class NLTKSimulation:
 
     def run_and_plot(self, experiment_list):
         self._run(experiment_list)
-        self._plot()
+        self.__plot()

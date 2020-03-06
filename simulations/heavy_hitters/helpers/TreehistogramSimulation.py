@@ -4,10 +4,8 @@ import pandas as pd
 from collections import Counter
 from algorithms.bnst_ldp.TreeHistogram.ServerSide import TreeHistogram
 from algorithms.apple_ldp.sfp.HeavyHitterList import HeavyHitterList
-from simulations.heavy_hitters.helpers.HeavyHitterSimulation import HeavyHitterSimulation
 
-
-class TreeHistogramSimulation(HeavyHitterSimulation):
+class TreeHistogramSimulation():
     def __init__(self, params):
         super().__init__()
         self.l = params["l"]
