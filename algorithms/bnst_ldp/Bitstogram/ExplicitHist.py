@@ -8,12 +8,16 @@ class ExplicitHist:
     # To get around this for non-integer data, we use an index_map, which takes a data element and produces an index of the matrix
         # Typically we use a hash function to do this
 
-    def __init__(self, dataset, domain_size, epsilon, index_map=lambda x: x):
+    def __init__(self, dataset, epsilon, domain_size, index_map=lambda x: x):
         self.epsilon = epsilon
         self.prob = 1 / ((math.e ** epsilon) + 1)
         self.n = len(dataset)
         self.d = domain_size
         self.index_map = index_map # The index_map -> See SuccintHist.py and ExplicitHistSimulation.py for examples
+
+        if domain_size is None:
+            domain = set(dataset)
+            self.index_map = lambda x: list(map(str, domain)).index(str(x)) # Index map based on the index of the element in the domain
 
         # Constructing randomised dataset (Step 1 of algorithm 5)
         self.y = [0] * self.n

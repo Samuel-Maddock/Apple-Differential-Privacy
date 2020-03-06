@@ -17,10 +17,11 @@ class ExplicitHistSimulation(FrequencyOracleSimulation):
         ldp_data = []
 
         # ExplicitHist privatises strings, so this ensure the index_mapper correctly maps domain values to indexes
-            # The ExplicitHist class auto casts data/domain elements to strings so we don't need to do that here
+            # The ExplicitHist class auto casts data elements to strings so we don't need to do that here
         index_map = lambda x: list(map(str, domain)).index(str(x)) # Index map for indexing hist -> Look at ExplicitHist.py for more info
 
-        hist = ExplicitHist(data, len(domain), self.epsilon, index_map=index_map)
+        hist = ExplicitHist(data, self.epsilon, len(domain), index_map=index_map)
+
         # -------------------- Simulating the server-side process --------------------
         ldp_freq = np.empty(len(domain))
         ldp_plot_data = np.empty(len(domain))

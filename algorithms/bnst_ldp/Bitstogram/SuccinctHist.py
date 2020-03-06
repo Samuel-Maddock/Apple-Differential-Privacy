@@ -59,7 +59,7 @@ class SuccintHist:
         hist_list = []
         for l in range(0, self.binary_domain_size):
             s = self.S[l]
-            hist_list.append(ExplicitHist(s, self.T * 2, self.epsilon/2, index_map=self.__index_mapper))
+            hist_list.append(ExplicitHist(s, self.epsilon / 2, self.T * 2, index_map=self.__index_mapper))
 
         S = set()
 
@@ -84,7 +84,8 @@ class SuccintHist:
             # In order to map binary strings to our matrix Z we hash them using a hash that maps our dataset 1-1
             # Again this is computationally poor (in both time and space)
         # The full Bitstogram algorithm deals with this problem
-        hist = ExplicitHist(self.dataset, len(self.dataset), self.epsilon/2, index_map=cms_helper.generate_hash(len(self.dataset), seed=3))
+        hist = ExplicitHist(self.dataset, self.epsilon / 2, len(self.dataset),
+                            index_map=cms_helper.generate_hash(len(self.dataset), seed=3))
 
         heavy_hitters = []
         print(S)
