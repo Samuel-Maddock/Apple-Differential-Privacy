@@ -5,7 +5,6 @@ from collections import defaultdict
 from algorithms.bnst_ldp.Bitstogram.Hashtogram import Hashtogram
 from algorithms.bnst_ldp.Bitstogram.ExplicitHist import ExplicitHist
 from algorithms.bnst_ldp.TreeHistogram.PrivateCountSketch import PrivateCountSketch
-from algorithms.core_ldp.FreqOracle import FreqOracle
 
 class ClientSFP:
     def __init__(self, cms_params, hash_families, hash_256, fragment_length=2, max_string_length=6, padding_char="*"):
@@ -51,7 +50,7 @@ class ClientSFP:
         }
 
         if oracle not in freq_oracles.keys():
-            assert("Must provide value oracle name:", freq_oracles.keys())
+            assert "Must provide value oracle name:", freq_oracles.keys()
 
         fragment_data = list(map(lambda x: self._create_fragment(x), data))
         words = list(zip(*fragment_data))[1]

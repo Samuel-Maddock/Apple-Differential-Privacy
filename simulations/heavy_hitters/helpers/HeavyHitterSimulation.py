@@ -50,7 +50,7 @@ class HeavyHitterSimulation:
                 palette.append(color_palette[x1.index(data)])
         return palette
 
-    def generate_metrics(self, original_data, heavy_hitter_data, sample_size):
+    def generate_metrics(self, experiment_name, original_data, heavy_hitter_data, sample_size):
         row = OrderedDict()
 
         heavy_hitter_data = dict(heavy_hitter_data)
@@ -64,7 +64,7 @@ class HeavyHitterSimulation:
                 avg_freq += heavy_hitter_data[word]
         fp = len(heavy_hitter_data.keys()) - tp
 
-        row["freq_oracle"] = "a"
+        row["freq_oracle"] = experiment_name
         row["recall"] = tp / len(original_data.keys())
         row["precision"] = tp / len(heavy_hitter_data.keys())
         row["false_positives"] = fp

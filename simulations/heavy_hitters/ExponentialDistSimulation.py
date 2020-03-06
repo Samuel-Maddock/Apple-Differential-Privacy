@@ -79,7 +79,7 @@ class ExponentialDistSimulation(HeavyHitterSimulation):
                 heavy_hitter_data.add(("empty", 0))
 
             # Generate metrics for this experiment
-            row = super().generate_metrics(freq_data, heavy_hitter_data, self.word_sample_size)
+            row = super().generate_metrics(experiment_name, freq_data, heavy_hitter_data, self.word_sample_size)
             row_list.append(row)
 
             x, y = zip(*reversed(heavy_hitter_data))

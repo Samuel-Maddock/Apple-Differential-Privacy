@@ -89,7 +89,7 @@ class NLTKSimulation(HeavyHitterSimulation):
             ax = axs[i + 1]
 
             # Generate metrics for this experiment
-            row = super().generate_metrics(freq_data, heavy_hitter_data, self.word_sample_size)
+            row = super().generate_metrics(experiment_name, freq_data, heavy_hitter_data, self.word_sample_size)
             row_list.append(row)
 
             if len(heavy_hitter_data) == 0:

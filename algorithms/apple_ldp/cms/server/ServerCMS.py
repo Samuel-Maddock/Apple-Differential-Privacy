@@ -13,7 +13,7 @@ class ServerCMS:
         self.c = (math.pow(math.e, epsilon / 2) + 1) / (math.pow(math.e, epsilon / 2) - 1)
 
         # If the data is not privatised then we use client CMS/HCMS to privatise it
-            # This wouldn't be used in practice, and is just a helper for simulations
+        # This wouldn't be used in practice, and is just a helper for simulations
         if is_raw_data:
             client_cms = ClientCMS(self.epsilon, self.hash_funcs, m)
             if is_hadamard:
