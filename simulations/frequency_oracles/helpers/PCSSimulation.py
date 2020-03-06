@@ -3,10 +3,8 @@ import numpy as np
 from algorithms.bnst_ldp.TreeHistogram.PrivateCountSketch import PrivateCountSketch
 from collections import Counter
 
-from simulations.frequency_oracles.helpers.FrequencyOracleSimulation import FrequencyOracleSimulation
 
-
-class PCSSimulation(FrequencyOracleSimulation):
+class PCSSimulation():
     def __init__(self, params, use_median=False):
         super().__init__()
         self.l = params["l"]

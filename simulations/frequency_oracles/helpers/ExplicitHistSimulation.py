@@ -4,10 +4,8 @@ from algorithms.bnst_ldp.Bitstogram.ExplicitHist import ExplicitHist
 from algorithms.apple_ldp.cms.CMSHelper import cms_helper
 from collections import Counter
 
-from simulations.frequency_oracles.helpers.FrequencyOracleSimulation import FrequencyOracleSimulation
 
-
-class ExplicitHistSimulation(FrequencyOracleSimulation):
+class ExplicitHistSimulation():
     def __init__(self, params):
         self.epsilon = params["epsilon"]
         self.name = "explicit_hist"

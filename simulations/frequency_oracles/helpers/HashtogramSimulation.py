@@ -4,9 +4,8 @@ from algorithms.bnst_ldp.Bitstogram.Hashtogram import Hashtogram
 from algorithms.apple_ldp.cms.CMSHelper import cms_helper
 from collections import Counter
 
-from simulations.frequency_oracles.helpers.FrequencyOracleSimulation import FrequencyOracleSimulation
 
-class HashtogramSimulation(FrequencyOracleSimulation):
+class HashtogramSimulation():
     def __init__(self, params, use_median=False):
         super().__init__()
         self.T = params["T"]

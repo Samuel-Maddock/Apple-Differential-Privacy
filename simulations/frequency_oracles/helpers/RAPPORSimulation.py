@@ -3,10 +3,8 @@ import numpy as np
 from algorithms.google_ldp.rappor.server.RAPPORServer import RAPPORServer
 from collections import Counter
 
-from simulations.frequency_oracles.helpers.FrequencyOracleSimulation import FrequencyOracleSimulation
 
-
-class RAPPORSimulation(FrequencyOracleSimulation):
+class RAPPORSimulation():
     def __init__(self, params):
         super().__init__()
         self.num_bloombits = params["num_bloombits"]

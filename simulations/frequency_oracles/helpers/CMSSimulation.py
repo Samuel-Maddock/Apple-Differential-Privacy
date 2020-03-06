@@ -1,6 +1,5 @@
 import numpy as np
 
-from simulations.frequency_oracles.helpers.FrequencyOracleSimulation import FrequencyOracleSimulation
 from algorithms.apple_ldp.cms.client.ClientCMS import ClientCMS
 from algorithms.apple_ldp.cms.server.ServerCMS import ServerCMS
 from algorithms.apple_ldp.cms.CMSHelper import cms_helper
@@ -8,7 +7,7 @@ from collections import Counter
 import time
 
 
-class CMSSimulation(FrequencyOracleSimulation):
+class CMSSimulation():
     def __init__(self, params, is_hcms=False):
         self.k = params["k"]
         self.m = params["m"]
