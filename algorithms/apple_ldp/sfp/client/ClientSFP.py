@@ -42,7 +42,7 @@ class ClientSFP:
         return r, string, l
 
     # Combines client-side + server-side hashtogram to produce estimators for hashtogram SFP
-    def fragment_with_oracle(self, data, oracle, params=None):
+    def fragment_with_oracle(self, data, oracle="", params=None):
 
         freq_oracles = {
             "priv_count_sketch": lambda dataset: PrivateCountSketch(**params, data=dataset),
