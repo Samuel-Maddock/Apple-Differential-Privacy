@@ -42,14 +42,16 @@ class ClientSFP:
         return r, string, l
 
     # Combines client-side + server-side hashtogram to produce estimators for hashtogram SFP
-    def fragment_with_oracle(self, data, oracle="", params=None):
-
+    def fragment_with_oracle(self, data, oracle, params=None):
         freq_oracles = {
             "priv_count_sketch": lambda dataset: PrivateCountSketch(**params, data=dataset),
             "priv_count_sketch_median": lambda dataset: PrivateCountSketch(**params, data=dataset, use_median=True),
             "hashtogram": lambda dataset: Hashtogram(dataset, **params),
             "hashtogram_median": lambda dataset: Hashtogram(dataset, **params, use_median=True)
         }
+
+        if oracle not in freq_oracles.keys():
+            assert("Must provide value oracle name:", freq_oracles.keys())
 
         fragment_data = list(map(lambda x: self._create_fragment(x), data))
         words = list(zip(*fragment_data))[1]
