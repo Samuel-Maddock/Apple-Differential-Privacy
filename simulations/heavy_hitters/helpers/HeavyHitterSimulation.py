@@ -15,12 +15,12 @@ class HeavyHitterSimulation:
         for i in range(0, len(experiment_list)):
             experiment_name = experiment_list[i][0]
             params = experiment_list[i][1]
-            experiment_freq_oracle = "" if params.get("freq_oracle", None) is None else params.get("freq_oracle")
+            experiment_freq_oracle = "" if params.get("freq_oracle", None) is None else " with " + params.get("freq_oracle")
 
-            print("Running experiment", i + 1, ":", experiment_name, "with", experiment_freq_oracle, "\nParams: \n %.300s...\n" % params.__str__())
+            print("Running experiment", i + 1, ":", experiment_name + experiment_freq_oracle, "\nParams: \n %.300s...\n" % params.__str__())
 
             experiment, experiment_output = self._run_experiment(experiment_name, params)
-            self.experiment_plot_data.append((experiment_list[i], experiment_output, experiment))
+            self.experiment_plot_data.append((experiment_list[i], experiment_output[0], experiment, experiment_output[1:3]))
 
     def _run_experiment(self, experiment_name, params):
         heavy_hitters = {
@@ -52,7 +52,6 @@ class HeavyHitterSimulation:
 
     def generate_metrics(self, experiment_name, original_data, heavy_hitter_data, sample_size):
         row = OrderedDict()
-
         heavy_hitter_data = dict(heavy_hitter_data)
 
         tp = 0
@@ -65,9 +64,16 @@ class HeavyHitterSimulation:
         fp = len(heavy_hitter_data.keys()) - tp
 
         row["freq_oracle"] = experiment_name
-        row["recall"] = tp / len(original_data.keys())
-        row["precision"] = tp / len(heavy_hitter_data.keys())
-        row["false_positives"] = fp
-        row["average_freq_of_fp"] = avg_freq/fp if fp != 0 else "NA"
+
+        if len(heavy_hitter_data.keys()) == 0:
+            row["recall"] = 0
+            row["precision"] = 0
+            row["false_positives"] = 0
+            row["average_freq_of_fp"] = "NA"
+        else:
+            row["recall"] = tp / len(original_data.keys())
+            row["precision"] = tp / len(heavy_hitter_data.keys())
+            row["false_positives"] = fp
+            row["average_freq_of_fp"] = avg_freq/fp if fp != 0 else "NA"
 
         return row

@@ -6,7 +6,7 @@ from algorithms.apple_ldp.cms.CMSHelper import cms_helper
 from algorithms.apple_ldp.sfp.HeavyHitterList import HeavyHitterList
 
 
-import math
+import math, time
 from collections import Counter
 
 
@@ -34,7 +34,7 @@ class SFPSimulation():
 
     def run(self, data):
         # -------------------- Simulating the client-side process --------------------
-
+        start_time = time.time()
         sfp_data = []
 
         hash_families = cms_helper.generate_hash_funcs(self.k, self.m), cms_helper.generate_hash_funcs(self.k_prime,
@@ -57,7 +57,8 @@ class SFPSimulation():
         else:
             word_estimator, fragment_estimator = client_sfp.fragment_with_oracle(data, self.freq_oracle,
                                                                                  self.freq_oracle_params)
-
+        client_time = time.time() - start_time
+        start_time = time.time()
         # -------------------- Simulating the server-side process --------------------
 
         D, freq_oracle, padding_char = server_sfp.generate_frequencies(word_estimator, fragment_estimator,
@@ -66,9 +67,12 @@ class SFPSimulation():
         sfp_freq_data = HeavyHitterList(len(D))
 
         for i in range(0, len(D)):
-            word = D[i].split(padding_char)[0]
+            # word = D[i].split(padding_char)[0] TODO: Is splitting on the padding character causing issues?
+            word = D[i]
             freq = freq_oracle(word)
             if freq >= math.sqrt(len(data)):
                 sfp_freq_data.append((word, freq))
 
-        return sfp_freq_data.get_data()
+        server_time = time.time() - start_time
+
+        return sfp_freq_data.get_data(), client_time, server_time

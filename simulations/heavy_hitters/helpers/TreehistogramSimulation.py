@@ -5,6 +5,8 @@ from collections import Counter
 from algorithms.bnst_ldp.TreeHistogram.ServerSide import TreeHistogram
 from algorithms.apple_ldp.sfp.HeavyHitterList import HeavyHitterList
 
+import time
+
 class TreeHistogramSimulation():
     def __init__(self, params):
         super().__init__()
@@ -21,9 +23,17 @@ class TreeHistogramSimulation():
 
     def run(self, data):
 
+        # Client-side
+        start_time = time.time()
+
         num_n_grams = int(self.max_string_length / self.gram_length)
 
         tree_histogram = TreeHistogram(self.l, self.w, self.epsilon, num_n_grams, self.gram_length, self.threshold, self.alphabet)
+
+        client_time = time.time() - start_time
+        start_time = time.time()
+
+        # Server-side
 
         if self.freq_oracle is not None and self.freq_oracle_params is not None:
             word_freq = tree_histogram.run_server_side_word_discovery(data, self.freq_oracle, self.freq_oracle_params)
@@ -35,4 +45,6 @@ class TreeHistogramSimulation():
         for item in word_freq:
             heavy_hitters.append(item)
 
-        return heavy_hitters.get_data()
+        server_time = time.time() - start_time
+
+        return heavy_hitters.get_data(), client_time, server_time

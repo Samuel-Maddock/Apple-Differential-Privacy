@@ -79,7 +79,12 @@ class ExponentialDistSimulation(HeavyHitterSimulation):
                 heavy_hitter_data.add(("empty", 0))
 
             # Generate metrics for this experiment
-            row = super().generate_metrics(experiment_name, freq_data, heavy_hitter_data, self.word_sample_size)
+            experiment_freq_oracle = "" if experiment_params.get("freq_oracle", None) is None else " with " + experiment_params.get("freq_oracle")
+
+            row = super().generate_metrics(experiment_name+experiment_freq_oracle, freq_data, heavy_hitter_data, self.word_sample_size)
+            row["client_time"] = plot_data[3][0]
+            row["server_time"] = plot_data[3][1]
+            row["total_time"] = plot_data[3][0] + plot_data[3][1]
             row_list.append(row)
 
             x, y = zip(*reversed(heavy_hitter_data))
@@ -98,14 +103,12 @@ class ExponentialDistSimulation(HeavyHitterSimulation):
                 "Discovered words and their estimated frequencies \n Experiment: " + experiment_name)
             # + "\n Parameters: " + str(experiment_params) )
 
-
-        pd.set_option('display.max_rows', None)
-        pd.set_option('display.max_columns', None)
-        pd.set_option('display.max_colwidth', -1)
-
-        pd.options.display.width = 0
+        pd.set_option('display.max_columns',500)
+        pd.set_option('display.width',1000)
+        pd.set_option('display.max_rows',0)
+        pd.set_option('display.float_format', '{:.4f}'.format)
         metrics = pd.DataFrame(row_list)
-        print(metrics)
+        print("\n", metrics, "\n")
 
         fig.tight_layout()
 

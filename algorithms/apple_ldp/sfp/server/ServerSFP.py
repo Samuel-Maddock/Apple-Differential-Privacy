@@ -3,10 +3,8 @@ from collections import namedtuple
 from collections import defaultdict
 from collections import Counter
 
-import string
 import numpy as np
 import itertools
-import time
 import pathos.pools as pp
 
 
@@ -36,7 +34,8 @@ class ServerSFP:
 
         for l in range(0, self.max_string_length):
             if dict_vals.get(l) is not None:
-                estimator_dict[l] = ServerCMS(dict_vals.get(l), *self.fragment_parameters, self.fragment_hash_functions).freq_oracle
+                estimator_dict[l] = ServerCMS(dict_vals.get(l), *self.fragment_parameters,
+                                              self.fragment_hash_functions).freq_oracle
 
         return estimator_dict
 
@@ -65,9 +64,7 @@ class ServerSFP:
 
         D = []
 
-        start = time.process_time()
         fragments = self.__generate_fragments(alphabet)
-        print("Fragments Generated:", time.process_time() - start)
 
         frequency_dict = defaultdict(lambda: Counter())
 
@@ -75,7 +72,6 @@ class ServerSFP:
         # We use python multithreading to make this quicker
         # We use the pathos library since the standard multiprocessing library doesn't allow pool maps in class methods
 
-        start = time.time()
         pool = pp.ProcessPool()
 
         def estimate_fragments(key, frag_estimator):
@@ -92,8 +88,6 @@ class ServerSFP:
 
         for item in pool_map:
             frequency_dict[item[0]] = item[1]
-
-        print("Fragments Tested:", time.time() - start)
 
         hash_table = defaultdict(lambda: defaultdict(list))
 
