@@ -41,7 +41,9 @@ class NormalDistSimulation(FrequencyOracleSimulation):
             experiment = ldp_plot_data[2]
 
             row = super().generate_stats(experiment_name, self.data, experiment_data, self.bins)
-            row["params"] = experiment_params.__str__()
+            row["client_time"] = ldp_plot_data[3][0]
+            row["server_time"] = ldp_plot_data[3][1]
+            row["total_time"] = ldp_plot_data[3][0] + ldp_plot_data[3][1]
             row_list.append(row)
 
             # Plotting a distplot of the data produced from the experiment
@@ -67,10 +69,13 @@ class NormalDistSimulation(FrequencyOracleSimulation):
 
         plt.savefig(filename)
 
-        pd.set_option('display.max_rows', None)
-        pd.set_option('display.max_columns', None)
-        pd.options.display.width = 0
+
         stats = pd.DataFrame(row_list)
+        pd.set_option('display.max_rows',0)
+        pd.set_option('display.max_columns',500)
+        pd.set_option('display.width',1000)
+        pd.set_option('display.float_format', '{:.4f}'.format)
+
         print("\n", stats, "\n")
 
         plt.show()

@@ -4,6 +4,7 @@ from algorithms.bnst_ldp.Bitstogram.Hashtogram import Hashtogram
 from algorithms.apple_ldp.cms.CMSHelper import cms_helper
 from collections import Counter
 
+import time
 
 class HashtogramSimulation():
     def __init__(self, params, use_median=False):
@@ -16,10 +17,14 @@ class HashtogramSimulation():
 
     def run(self, data, domain):
         # -------------------- Simulating the client-side process --------------------
+        start_time = time.time()
         ldp_data = []
         hash_funcs = cms_helper.generate_hash_funcs(self.R, self.T)
 
         hashtogram = Hashtogram(data, hash_funcs, self.T, self.epsilon, use_median=self.use_median)
+
+        client_time = time.time()-start_time
+        start_time = time.time()
 
         # -------------------- Simulating the server-side process --------------------
         ldp_freq = np.empty(len(domain))
@@ -30,4 +35,6 @@ class HashtogramSimulation():
             ldp_freq[i] = hashtogram.freq_oracle(str(item))  # Freq Oracle
             ldp_plot_data = np.append(ldp_plot_data, [item] * int(round(ldp_freq[i])))  # Generate estimated dataset
 
-        return ldp_plot_data
+        server_time = time.time()-start_time
+
+        return ldp_plot_data, client_time, server_time

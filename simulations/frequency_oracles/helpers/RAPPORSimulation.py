@@ -3,6 +3,8 @@ import numpy as np
 from algorithms.google_ldp.rappor.server.RAPPORServer import RAPPORServer
 from collections import Counter
 
+import time
+
 
 class RAPPORSimulation():
     def __init__(self, params):
@@ -17,8 +19,8 @@ class RAPPORSimulation():
         self.name = "RAPPOR"
 
     def run(self, data, domain):
-        # -------------------- Simulating the client and server-side process --------------------
-
+        # -------------------- Simulating the client-side process --------------------
+        start_time = time.time()
         rappor_server = RAPPORServer(self.num_bloombits,
                                      self.num_hashes, self.num_of_cohorts,
                                      [self.prob_p, self.prob_q, self.prob_f])
@@ -27,12 +29,16 @@ class RAPPORSimulation():
             rappor_client = rappor_server.init_client_instance(np.random.randint(0, self.num_of_cohorts - 1))
             rappor_server.add_report(rappor_client.generate_report(str(data[i])))
 
-        hist = rappor_server.generate_freq_hist(list(map(str, domain)))
+        client_time = time.time() - start_time
 
-        print(hist)
+        # -------------------- Simulating the server-side process --------------------
+        start_time = time.time()
+        hist = rappor_server.generate_freq_hist(list(map(str, domain)))
 
         ldp_plot_data = np.zeros(len(domain))
         for row in hist.values.tolist():
             ldp_plot_data = np.append(ldp_plot_data, [int(row[0])] * int(row[1]))
 
-        return ldp_plot_data
+        server_time = time.time() - start_time
+
+        return ldp_plot_data, client_time, server_time

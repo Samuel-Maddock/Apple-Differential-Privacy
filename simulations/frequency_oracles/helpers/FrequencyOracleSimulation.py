@@ -29,7 +29,7 @@ class FrequencyOracleSimulation:
             print("Running experiment", i + 1, ":", experiment_name, "with params: \n", params.__str__(), "\n")
 
             experiment, experiment_output = self._run_experiment(experiment_name, params)
-            self.experiment_plot_data.append((experiment_list[i], experiment_output, experiment))
+            self.experiment_plot_data.append((experiment_list[i], experiment_output[0], experiment, experiment_output[1:3]))
 
     def _run_experiment(self, experiment_name, params):
 

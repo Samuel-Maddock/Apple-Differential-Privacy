@@ -18,6 +18,7 @@ class CMSSimulation():
 
     def run(self, data, domain):
         # -------------------- Simulating the client-side process --------------------
+        start_time = time.time()
         hash_funcs = cms_helper.generate_hash_funcs(self.k, self.m)
 
         ldp_data = []
@@ -31,6 +32,9 @@ class CMSSimulation():
             else:
                 ldp_data.append(client_cms.client_cms(data[i]))
 
+        client_time = time.time()-start_time
+        start_time = time.time()
+
         # -------------------- Simulating the server-side process --------------------
 
         # Create a sketch matrix of the ldp data
@@ -41,4 +45,6 @@ class CMSSimulation():
         for i, item in enumerate(domain):
             ldp_plot_data = np.append(ldp_plot_data, [item] * int(round(server_cms.freq_oracle(item)))) # Generate estimated dataset
 
-        return ldp_plot_data
+        server_time = time.time()-start_time
+
+        return ldp_plot_data, client_time, server_time
