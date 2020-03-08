@@ -21,7 +21,7 @@ class NormalDistSimulation(FrequencyOracleSimulation):
     def _plot(self):
         bins = np.arange(start=min(self.data), stop=max(self.data) + 1)
 
-        figsize = (len(self.experiment_plot_data) * 7, len(self.experiment_plot_data) * 7)
+        figsize = (len(self.experiment_plot_data) * 3, len(self.experiment_plot_data) * 5)
 
         fig, axs = plt.subplots(len(self.experiment_plot_data) + 2, figsize=figsize)
         colours = sns.color_palette("hls", len(self.experiment_plot_data) + 1)  # Generate colours for each plot
@@ -47,7 +47,7 @@ class NormalDistSimulation(FrequencyOracleSimulation):
             row_list.append(row)
 
             # Plotting a distplot of the data produced from the experiment
-            sns.distplot(experiment_data, bins=bins, ax=axs[i + 1], color=colours[i + 1], hist_kws={'ec': "black"})
+            sns.distplot(experiment_data, bins=bins, ax=axs[i + 1], color=colours[i + 1], kde=True, kde_kws={"bw": "silverman"}, hist_kws={'ec': "black"})
             sns.distplot(self.data, bins=bins, hist=False, ax=axs[i + 1], color=colours[0])
 
             axs[i + 1].set_title(

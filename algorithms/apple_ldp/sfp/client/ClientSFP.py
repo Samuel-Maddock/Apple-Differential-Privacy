@@ -1,5 +1,6 @@
 import numpy as np
 from algorithms.apple_ldp.cms.client.ClientCMS import ClientCMS
+from algorithms.apple_ldp.cms.server.ServerCMS import ServerCMS
 from collections import namedtuple
 from collections import defaultdict
 from algorithms.bnst_ldp.Bitstogram.Hashtogram import Hashtogram
@@ -43,6 +44,7 @@ class ClientSFP:
     # Combines client-side + server-side hashtogram to produce estimators for hashtogram SFP
     def fragment_with_oracle(self, data, oracle, params=None):
         freq_oracles = {
+            "hcms": lambda dataset: ServerCMS(dataset, **params, is_hadamard=True, is_raw_data=True),
             "priv_count_sketch": lambda dataset: PrivateCountSketch(**params, data=dataset),
             "priv_count_sketch_median": lambda dataset: PrivateCountSketch(**params, data=dataset, use_median=True),
             "hashtogram": lambda dataset: Hashtogram(dataset, **params),
