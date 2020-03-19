@@ -3,7 +3,7 @@ from .config import config
 import numpy as np
 import math
 
-def randomize(bitVec):
+def randomize(bitVec, epsilon):
     unsignedBits = np.abs(bitVec)
     assert (np.sum(unsignedBits) == 1.0), 'Incorrect number of bits set in the data vector'
     indexOfData = np.where(unsignedBits == 1)[0][0]
@@ -12,6 +12,6 @@ def randomize(bitVec):
     unBiasedPMBits[indexOfData] = 0
     privatizedBitVec = unBiasedPMBits + bitVec
 
-    bias = math.exp(config.epsilon) / (1 + math.exp(config.epsilon))
+    bias = math.exp(epsilon) / (1 + math.exp(epsilon))
     privatizedBitVec[indexOfData] *= (2 * np.random.binomial(1,bias) - 1)
     return privatizedBitVec
