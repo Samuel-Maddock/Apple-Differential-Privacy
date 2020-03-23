@@ -50,7 +50,7 @@ class PrivateCountSketch:
 
         privatized_vec = randomize(data_vector, self.epsilon)
 
-        self.sketch_matrix[hash_id] += (privatized_vec * self.epsilon * self.l)
+        self.sketch_matrix[hash_id] += (privatized_vec * self.l)
 
     def write_sketch(self, sketch_location):
         np.save(sketch_location, self.sketch_matrix)

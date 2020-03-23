@@ -1,5 +1,4 @@
 # Duchi-Jordan-Wainwright 2013, Bassily-Smith-2015 randomizer
-from .config import config
 import numpy as np
 import math
 
