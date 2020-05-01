@@ -21,13 +21,13 @@ class NormalDistSimulation(FrequencyOracleSimulation):
     def _plot(self):
         bins = np.arange(start=min(self.data), stop=max(self.data) + 1)
 
-        figsize = (len(self.experiment_plot_data) * 3, len(self.experiment_plot_data) * 5)
+        figsize = (12, 20)
 
-        fig, axs = plt.subplots(len(self.experiment_plot_data) + 2, figsize=figsize)
+        fig, axs = plt.subplots(len(self.experiment_plot_data) + 1, figsize=figsize)
         colours = sns.color_palette("hls", len(self.experiment_plot_data) + 1)  # Generate colours for each plot
 
         # Plotting a distplot of our integer data sampled from a normal dist
-        sns.distplot(self.data, bins=bins, ax=axs[0], hist_kws={'ec': "black"}, color=colours[0])
+        sns.distplot(self.data, bins=bins, ax=axs[0], hist_kws={'ec': "black"}, color=colours[0], label="Original")
         axs[0].set_title(
             "Integer data sampled from a Normal distribution \n $N=${}, sampled from $N({}, {})$".format(self.n,
                                                                                                          self.mu,
@@ -47,28 +47,30 @@ class NormalDistSimulation(FrequencyOracleSimulation):
             row_list.append(row)
 
             # Plotting a distplot of the data produced from the experiment
-            sns.distplot(experiment_data, bins=bins, ax=axs[i + 1], color=colours[i + 1], kde=True, kde_kws={"bw": "silverman"}, hist_kws={'ec': "black"})
-            sns.distplot(self.data, bins=bins, hist=False, ax=axs[i + 1], color=colours[0])
+            sns.distplot(self.data, bins=bins, ax=axs[i + 1],  color=colours[0], hist_kws={'ec': "black"}, kde=False)
+            sns.distplot(experiment_data, bins=bins, ax=axs[i + 1], color=colours[i + 1], hist_kws={'ec': "black"}, kde=False, label=experiment_name)
 
             axs[i + 1].set_title(
-                "Differentially private " + experiment_name + " data produced from the normal sample \n Parameters: " + str(
+                experiment_name + "\n Parameters: " + str(
                     experiment_params))
 
-            # Plotting the kde from above for comparison in the last axis
-            sns.distplot(experiment_data, hist=False, bins=bins, ax=axs[len(axs) - 1], color=colours[i + 1])
+            # # Plotting the kde from above for comparison in the last axis
+            # sns.distplot(experiment_data, hist=False, bins=bins, ax=axs[len(axs) - 1], color=colours[i + 1])
 
-        # Plot the original kde of the data in the last axis
-        sns.distplot(self.data, bins=bins, hist=False, ax=axs[len(axs) - 1], color=colours[0])
+        # # Plot the original kde of the data in the last axis
+        # sns.distplot(self.data, bins=bins, hist=False, ax=axs[len(axs) - 1], color=colours[0])
+        fig.legend()
+        plt.legend(loc="upper right", bbox_to_anchor=(1.3, 1.2))
 
         fig.tight_layout()
 
         if not os.path.exists('plots'):
             os.mkdir('plots')
 
-        filename = "plots/" + "normal_exp" + str(uuid.uuid4()) + ".png"
+        name = str(uuid.uuid4())
+        filename = "plots/" + "normal_exp" + name + ".png"
 
         plt.savefig(filename)
-
 
         stats = pd.DataFrame(row_list)
         pd.set_option('display.max_rows',0)
@@ -77,7 +79,7 @@ class NormalDistSimulation(FrequencyOracleSimulation):
         pd.set_option('display.float_format', '{:.4f}'.format)
 
         print("\n", stats, "\n")
-
+        stats.to_csv("plots/metrics/" + name + ".csv")
         plt.show()
         print("Plot Displayed...")
 
