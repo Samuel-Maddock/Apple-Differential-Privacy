@@ -30,12 +30,12 @@ class HeavyHitterSimulation:
             "bitstogram": lambda parameters: BitstogramSimulation(parameters)
         }
 
-        if experiment_name not in heavy_hitters.keys():
+        if experiment_name.split(" ")[0] not in heavy_hitters.keys():
             assert "experiment name must be one of: ", heavy_hitters.keys()
 
-        experiment = heavy_hitters.get(experiment_name)(params)
-
-        return experiment, experiment.run(self.data)
+        experiment = heavy_hitters.get(experiment_name.split(" ")[0])(params)
+        data = experiment.run(self.data)
+        return (experiment, data)
 
     def _generate_palette(self, color_palette, x1, x2):
         # Generate colour palette for a graph of heavy hitter data

@@ -53,7 +53,7 @@ class ExponentialDistSimulation(HeavyHitterSimulation):
         freq_data = Counter(self.data)
         print("Plotting results...")
 
-        figsize = (len(self.experiment_plot_data) * 3, len(self.experiment_plot_data) * 5)
+        figsize = (12, 20)
         fig, axs = plt.subplots(len(self.experiment_plot_data) + 1, figsize=figsize)
         ax1 = axs[0]
 
@@ -100,7 +100,7 @@ class ExponentialDistSimulation(HeavyHitterSimulation):
                 experiment_name = experiment_name + " with " + experiment_params["freq_oracle"]
 
             ax.set_title(
-                "Discovered words and their estimated frequencies \n Experiment: " + experiment_name)
+                "Experiment: " + experiment_name)
             # + "\n Parameters: " + str(experiment_params) )
 
         pd.set_option('display.max_columns',500)
@@ -115,7 +115,9 @@ class ExponentialDistSimulation(HeavyHitterSimulation):
         if not os.path.exists('plots'):
             os.mkdir('plots')
 
-        filename = "plots/" + "exponential_exp" + str(uuid.uuid4()) + ".png"
+        name = str(uuid.uuid4())
+        metrics.to_csv("plots/metrics/" + name  + ".csv" )
+        filename = "plots/" + "exponential_exp" + name + ".png"
         plt.savefig(filename)
         plt.show()
         print("Plot saved, simulation ended...")

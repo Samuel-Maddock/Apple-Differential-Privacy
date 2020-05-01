@@ -6,6 +6,7 @@ from algorithms.bnst_ldp.TreeHistogram.ServerSide import TreeHistogram
 from algorithms.apple_ldp.sfp.HeavyHitterList import HeavyHitterList
 
 import time
+import math
 
 class TreeHistogramSimulation():
     def __init__(self, params):
@@ -43,7 +44,8 @@ class TreeHistogramSimulation():
         heavy_hitters = HeavyHitterList(len(word_freq))
 
         for item in word_freq:
-            heavy_hitters.append(item)
+            if item[1] >= math.sqrt(len(data)):
+                heavy_hitters.append(item)
 
         server_time = time.time() - start_time
 

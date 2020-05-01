@@ -47,16 +47,16 @@ class FrequencyOracleSimulation:
         if experiment_name not in freq_oracles.keys():
             assert "experiment name must be one of: ", freq_oracles.keys()
 
-        experiment = freq_oracles.get(experiment_name)(params)
+        experiment = freq_oracles.get(experiment_name.split(" ")[0])(params)
 
         return experiment, experiment.run(self.data, self.bins)
 
     def __calculate_error(self, data, ldp_data, domain):
         original_freq_data = dict(Counter(data.tolist()))
         ldp_freq_data = dict(Counter(ldp_data.tolist()))
-
         mse = 0
         max_error = 0
+        min_error = 0
         total_error = 0
         max_item = ""
 
@@ -65,23 +65,28 @@ class FrequencyOracleSimulation:
             if max_error < error:
                 max_error = error
                 max_item = item
+
+            if error < min_error:
+                min_error = error
+
             total_error += error
             mse += error**2
 
         avg_error = total_error / len(domain)
         mse = mse / len(domain)
 
-        return max_error, max_item, avg_error, mse
+        return max_error, min_error, max_item, avg_error, mse
 
     def generate_stats(self, experiment_name, data, ldp_data, domain):
         row = OrderedDict()
-        max_error, max_item, avg_error, mse = self.__calculate_error(data, ldp_data, domain)
+        max_error, min_error, max_item, avg_error, mse = self.__calculate_error(data, ldp_data, domain)
 
         row["freq_oracle"] = experiment_name
         row["mse"] = mse
         row["average_error"] = avg_error
         row["max_error"] = max_error
         row["max_item"] = max_item
+        row["min_error"] = min_error
 
         return row
 

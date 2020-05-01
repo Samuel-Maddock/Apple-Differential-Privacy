@@ -55,13 +55,14 @@ class NLTKSimulation(HeavyHitterSimulation):
         self.max_string_length = max_string_length
         print("Length of dataset is", len(dataset))
         print(alphabet)
+        print(max_string_length)
         return dataset
 
     def _run_experiment(self, experiment_name, params):
         params["alphabet"] = self.alphabet
         params["max_string_length"] = self.max_string_length
 
-        super()._run_experiment(experiment_name, params)
+        return super()._run_experiment(experiment_name, params)
 
     def __plot(self):
         freq_data = Counter(self.data)
@@ -115,7 +116,7 @@ class NLTKSimulation(HeavyHitterSimulation):
 
         pd.options.display.width = 0
         metrics = pd.DataFrame(row_list)
-
+        print(metrics)
         fig.tight_layout()
 
         if not os.path.exists('plots'):

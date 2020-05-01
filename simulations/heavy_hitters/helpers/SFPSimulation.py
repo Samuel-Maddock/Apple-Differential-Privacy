@@ -65,10 +65,10 @@ class SFPSimulation():
                                                                        self.alphabet)
 
         sfp_freq_data = HeavyHitterList(len(D))
+        print(D)
 
         for i in range(0, len(D)):
-            # word = D[i].split(padding_char)[0] TODO: Is splitting on the padding character causing issues?
-            word = D[i]
+            word = D[i].replace(padding_char, "")
             freq = freq_oracle(word)
             if freq >= math.sqrt(len(data)):
                 sfp_freq_data.append((word, freq))
