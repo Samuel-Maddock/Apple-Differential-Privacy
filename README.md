@@ -6,31 +6,21 @@ The project aims to provide implementations of the most recent and practical alg
 
 The repo aims to implement the following:
 * Apple's LDP: [Paper](https://machinelearning.apple.com/docs/learning-with-privacy-at-scale/appledifferentialprivacysystem.pdf)
-* Googles's RAPPOR: [Paper](http://arxiv.org/abs/1407.6981), [Repo](https://www.github.com/google/rappor)
+* Googles' RAPPOR: [Paper](http://arxiv.org/abs/1407.6981), [Repo](https://www.github.com/google/rappor)
 * Extensions to Google's RAPPOR for heavy-hitters: [Paper](https://arxiv.org/abs/1503.01214)
 * Implement two further LDP algorithms outlined in ["Practical Locally Private Heavy Hitters"](https://arxiv.org/abs/1707.04982)
 
 A good introduction and brief survey of recent LDP algorithms is presented [here](https://arxiv.org/abs/1907.11908).
 
-:warning: This repo currently is very much WIP and much of the code is undocumented :warning:
+:warning: While most of the code is done, much of the code is undocumented :warning:
 
 # TODO
-- [x] Apple: Implement Count-Mean-Sketch (CMS) and Hadamard Count-Mean-Sketch
-- [x] Apple: Implement the Sequence Fragment Puzzle (SFP) Algorithm
-- [x] Apple: Basic simulations for CMS, HCMS, SFP 
-- [x] Google: Port over RAPPOR client-side from the RAPPOR repo (based on code [here](https://github.com/google/rappor/blob/master/client/python/rappor.py))
-- [x] Google: Implement RAPPOR's server-side algorithm (based on code [here](https://github.com/google/rappor/tree/master/analysis/R))
+- [ ] Misc: Documentation !!!
+- [ ] Separate out Apple implementations from the simulation framework into a diff repo
 - [ ] Google: Implement the RAPPOR extension
 - [ ] Google: Simulations for RAPPOR + extensions
-- [x] BNST: Implement TreeHistogram (based on code [here](https://bitbucket.org/abhradt/locallyprivatehistogram/src/master/))
-- [x] BNST: Implement the Simple Bitstogram Protocol (ExplicitHist + SuccinctHist)
-- [x] BNST: Implement the Full Bitstogram Protocol 
-- [x] BNST: Simulations for TreeHistogram and Bitstogram
-- [x] Misc: NYC Taxicab Simulation
-- [x] Misc: NLTK Simulation
-- [ ] Misc: Documentation !!!
-- [ ] Misc: Support running Heavy Hitter algos with different freq oracles
 - [ ] Misc: Finishing the README
+
 # Resources
 1) [Algorithmic Foundations of Differential Privacy](https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf)
 2) [Local Differential Privacy: a tutorial](https://arxiv.org/abs/1907.11908)

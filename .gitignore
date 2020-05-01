@@ -3,7 +3,6 @@ __pycache__/
 *.pyc
 simulations/frequency_oracles/plots
 simulations/frequency_oracles/_RAPPOR
-simulations/frequency_oracles/NYC Simulation/Heatmaps
 simulations/frequency_oracles/NYC Simulation/data
 simulations/frequency_oracles/one off plots
 venv
