@@ -113,7 +113,7 @@ class TreeHistogram:
         while word_queue.__len__() != 0:
             current_prefix = word_queue.popleft()
             current_prefix_after_stripping_empty = current_prefix.replace(self.empty_char, '')
-            freq_for_current_prefix = int(fragment_estimator.freq_oracle(current_prefix))
+            freq_for_current_prefix = int(fragment_estimator.freq_oracle(current_prefix) * scaling_factor)
 
             if freq_for_current_prefix < self.threshold:
                 continue
@@ -154,7 +154,7 @@ class TreeHistogram:
         heavy_hitters = {}
         for key, value in noisy_frequencies.items():
             freq = word_estimator.freq_oracle(key)
-            if min(value,freq) >= 0:
+            if min(value,freq) >= math.sqrt(len(data)):
                 heavy_hitters[key] = max(value,freq)
 
         return list(heavy_hitters.items())
