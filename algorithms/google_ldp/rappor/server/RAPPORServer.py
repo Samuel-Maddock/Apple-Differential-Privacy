@@ -9,7 +9,7 @@ class RAPPORServer:
         self.params = Params(num_bloombits, num_hashes, num_of_cohorts, probabilities)
         self.reports = []
         self.analysis_input_path = "_RAPPOR/analysis_input/"
-        self.analysis_output_path = "_RAPPOR/analysis_output"
+        self.analysis_output_path = "_RAPPOR/analysis_output/"
         self.dir_path = os.path.dirname(os.path.realpath(__file__))
 
         os.makedirs(self.analysis_output_path, exist_ok=True)

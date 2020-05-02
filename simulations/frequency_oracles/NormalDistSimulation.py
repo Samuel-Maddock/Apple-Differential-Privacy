@@ -79,6 +79,10 @@ class NormalDistSimulation(FrequencyOracleSimulation):
         pd.set_option('display.float_format', '{:.4f}'.format)
 
         print("\n", stats, "\n")
+
+        if not os.path.exists('plots/metrics'):
+            os.mkdir('plots/metrics')
+
         stats.to_csv("plots/metrics/" + name + ".csv")
         plt.show()
         print("Plot Displayed...")

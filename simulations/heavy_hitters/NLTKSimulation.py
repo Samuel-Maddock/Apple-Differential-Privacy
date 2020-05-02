@@ -122,8 +122,15 @@ class NLTKSimulation(HeavyHitterSimulation):
         if not os.path.exists('plots'):
             os.mkdir('plots')
 
-        filename = "plots/" + "nltk_exp" + str(uuid.uuid4()) + ".png"
+        name = str(uuid.uuid4())
+        filename = "plots/" + "nltk"+ name + str(uuid.uuid4()) + ".png"
         plt.savefig(filename)
+
+        if not os.path.exists('plots/metrics'):
+            os.mkdir('plots/metrics')
+
+        metrics.to_csv("plots/metrics/" + "nltk" + name  + ".csv" )
+
         plt.show()
         print("Plot saved, simulation ended...")
 

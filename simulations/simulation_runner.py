@@ -1,3 +1,6 @@
+import sys
+sys.path.append("..")
+
 from simulations.frequency_oracles.NormalDistSimulation import NormalDistSimulation
 from simulations.heavy_hitters.ExponentialDistSimulation import ExponentialDistSimulation
 from simulations.heavy_hitters.NLTKSimulation import NLTKSimulation

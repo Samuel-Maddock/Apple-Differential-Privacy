@@ -116,6 +116,10 @@ class ExponentialDistSimulation(HeavyHitterSimulation):
             os.mkdir('plots')
 
         name = str(uuid.uuid4())
+
+        if not os.path.exists('plots/metrics'):
+            os.mkdir('plots/metrics')
+
         metrics.to_csv("plots/metrics/" + name  + ".csv" )
         filename = "plots/" + "exponential_exp" + name + ".png"
         plt.savefig(filename)
