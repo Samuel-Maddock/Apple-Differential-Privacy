@@ -1,9 +1,7 @@
-# From: https://github.com/alexkaratarakis/gitattributes/blob/master/Python.gitattributes
-
-# Basic .gitattributes for a python repo.
-
 * linguist-vendored
 *.py linguist-vendored=false
+*.ipynb  linguist-vendored=false
+*.R  linguist-vendored=false
 
 # Source files
 # ============
@@ -24,14 +22,3 @@
 *.pyc    binary
 *.pyd    binary
 *.pyo    binary
-
-# Jupyter notebook
-*.ipynb  text
-
-# Note: .db, .p, and .pkl files are associated
-# with the python modules ``pickle``, ``dbm.*``,
-# ``shelve``, ``marshal``, ``anydbm``, & ``bsddb``
-# (among others).
-
-
-simulations/NYC Simulation/*.html linguist-generated=false
