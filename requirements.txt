@@ -7,3 +7,4 @@ matplotlib
 seaborn
 scipy
 numpy
+reedsolo

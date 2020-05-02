@@ -1,6 +1,6 @@
 # ---------- Installation -------------
 
-To install dependencies for the project when in the root directory run:
+To install dependencies for the project when in the (project) root directory run:
     python -m pip install -r ./requirements.txt
 
 # --------------- Structure of Code ------------------
@@ -11,15 +11,20 @@ All the code for the algorithms are under the algorithms module:
     3) RAPPOR -  Python 3 implementation and wrapper of Google's RAPPOR (client + server side)
 
 All of the simulation framework code is within the simulation module:
-    1) frequency_oracles - Stores wrappers and helpers for all the frequency oracle algorithms, and store code for the Normal distribution experiment
+    1) frequency_oracles - Stores helpers for all the frequency oracle algorithms, and store code for the Normal distribution experiment
     2) heavy_hitters - Stores helpers for all the heavy hitter algorithms and the Exponential dist experiment
 
-# ----------------- Running Code -------------------------
+# ----------------- Running Simulation Code -------------------------
 
-To run the default simulations that will generate results similar to the ones you see in the report you need to run methods within the simulation_runner.py file:
+To run the default simulations that will generate plots similar to the ones you see in the report you need to run methods within the simulation_runner.py file:
     1) You will need to manually run one of the methods in ./simulations/simulation_runner.py
         These methods are commented, and explain how they correspond to a plot in the report
     2) All plots and metrics are generated and saved under ./simulations/frequency_oracles/plots
+
+Then you just need to run the simulation_runne.py file i.e
+    python simulation_runner.py
+
+# --------------------------- NYC Heatmap Analysis -----------------------------
 
 For NYC Taxicab heatmaps:
     1) All of the heatmaps generated have been saved as .html files under ./simulations/frequency_oracles/Heatmaps
