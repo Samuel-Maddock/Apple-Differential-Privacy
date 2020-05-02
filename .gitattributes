@@ -2,6 +2,9 @@
 
 # Basic .gitattributes for a python repo.
 
+* linguist-vendored
+*.py linguist-vendored=false
+
 # Source files
 # ============
 *.pxd    text diff=python
@@ -29,3 +32,6 @@
 # with the python modules ``pickle``, ``dbm.*``,
 # ``shelve``, ``marshal``, ``anydbm``, & ``bsddb``
 # (among others).
+
+
+simulations/NYC Simulation/*.html linguist-generated=false
