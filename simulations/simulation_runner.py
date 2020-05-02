@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append("..")
 
 from simulations.frequency_oracles.NormalDistSimulation import NormalDistSimulation
@@ -10,10 +11,14 @@ from algorithms.apple_ldp.cms.server.ServerCMS import ServerCMS
 import warnings
 import math
 
+
 # Parameters are stored in ./parameters.py
 # Run one of these method's to see plots that correspond to the ones in the report
 
 # warnings.filterwarnings("error", category=RuntimeWarning)
+
+
+# Varying K parameter in CMS (Fig 5.7 pg 37)
 
 def cms_k_experiment(simulation, m=1, iters=100):
     experiment_list = []
@@ -26,6 +31,37 @@ def cms_k_experiment(simulation, m=1, iters=100):
     simulation.run_and_plot(experiment_list)
 
 
+# The normal dist experiment (pg 33-34 Fig 5.2 & 5.3)
+def normal_dist_experiment():
+    normal_simulation = NormalDistSimulation(N, mu, sd)
+    normal_simulation.run_and_plot([("cms", cms), ("hcms", cms), ("priv_count_sketch", priv_count_sketch),
+                                    ("priv_count_sketch_median", priv_count_sketch), ("explicit_hist", explicit_hist),
+                                    ("hashtogram", hashtogram), ("hashtogram_median", hashtogram), ("rappor", rappor)])
+
+
+# Varying privacy parameter epsilon with Private Count Sketch (PCS) (pg 36 Fig 5.6)
+def pcs_with_diff_epsilon():
+    normal_simulation = NormalDistSimulation(N, mu, sd)
+    normal_simulation.run_and_plot([("priv_count_sketch e=3", priv_count_sketch), ("priv_count_sketch e=1.5", pcs2),
+                                    ("priv_count_sketch e=1", pcs3), ("priv_count_sketch e=0.5", pcs4)])
+
+
+# Varying n-gram size in SFP (Fig 5.11 pg 43)
+def sfp_with_diff_params():
+    exponential_simulation = ExponentialDistSimulation(N, p, alphabet, word_length, word_sample_size)
+    exponential_simulation.run_and_plot(
+        [("sfp", sfp2), ("sfp", sfp3), ("sfp", sfp1), ("sfp", sfp4), ("sfp", sfp), ("sfp", sfp5)])
+
+
+# Varying n-gram size in TreeHist (Fig 5.11 pg 43)
+def treehist_with_diff_params():
+    exponential_simulation = ExponentialDistSimulation(N, p, alphabet, word_length, word_sample_size)
+    exponential_simulation.run_and_plot(
+        [("treehistogram", treehist1), ("treehistogram", treehist2), ("treehistogram", treehist3),
+         ("treehistogram", treehist4), ("treehistogram", treehist5), ("treehistogram", treehist6)])
+
+
+# Varying threshold parameter with SFP (pg 44 Fig 5.12)
 def threshold_sfp_experiment(simulation, T=10, iters=20):
     experiment_list = []
     for i in range(0, iters):
@@ -36,6 +72,7 @@ def threshold_sfp_experiment(simulation, T=10, iters=20):
     simulation.run_and_plot(experiment_list)
 
 
+# Varying threshold parameter with TreeHist (pg 44 Fig 5.12)
 def threshold_experiment(simulation, T=10, iters=20):
     experiment_list = []
     for i in range(0, iters):
@@ -46,41 +83,17 @@ def threshold_experiment(simulation, T=10, iters=20):
     simulation.run_and_plot(experiment_list)
 
 
-def normal_dist_experiment():
-    normal_simulation = NormalDistSimulation(N, mu, sd)
-    normal_simulation.run_and_plot([("cms", cms), ("hcms", cms), ("priv_count_sketch", priv_count_sketch),
-                                    ("priv_count_sketch_median", priv_count_sketch), ("explicit_hist", explicit_hist),
-                                    ("hashtogram", hashtogram), ("hashtogram_median", hashtogram), ("rappor", rappor)])
-
-
+# Varying freq oracles with SFP (pg 45 Fig 5.13)
 def sfp_with_diff_freq_oracles():
     exponential_simulation = ExponentialDistSimulation(N, p, alphabet, word_length, word_sample_size)
     exponential_simulation.run_and_plot([("sfp", sfp_3), ("sfp", sfp), ("sfp", sfp_1)])
 
 
+# Varying freq oracles with SFP (pg 46 Fig 5.14)
 def treehist_with_diff_freq_oracles():
     exponential_simulation = ExponentialDistSimulation(N, p, alphabet, word_length, word_sample_size)
     exponential_simulation.run_and_plot(
         [("treehistogram", treehist_3), ("treehistogram", treehistogram), ("treehistogram", treehist_1)])
-
-
-def sfp_with_diff_params():
-    exponential_simulation = ExponentialDistSimulation(N, p, alphabet, word_length, word_sample_size)
-    exponential_simulation.run_and_plot(
-        [("sfp", sfp2), ("sfp", sfp3), ("sfp", sfp1), ("sfp", sfp4), ("sfp", sfp), ("sfp", sfp5)])
-
-
-def treehist_with_diff_params():
-    exponential_simulation = ExponentialDistSimulation(N, p, alphabet, word_length, word_sample_size)
-    exponential_simulation.run_and_plot(
-        [("treehistogram", treehist1), ("treehistogram", treehist2), ("treehistogram", treehist3),
-         ("treehistogram", treehist4), ("treehistogram", treehist5), ("treehistogram", treehist6)])
-
-
-def pcs_with_diff_epsilon():
-    normal_simulation = NormalDistSimulation(N, mu, sd)
-    normal_simulation.run_and_plot([("priv_count_sketch e=3", priv_count_sketch), ("priv_count_sketch e=1.5", pcs2),
-                                    ("priv_count_sketch e=1", pcs3), ("priv_count_sketch e=0.5", pcs4)])
 
 
 # Run one of the above methods to see experiment results, plots will be generated and saved under a folder in frequency_oracles/plots
