@@ -1,5 +1,7 @@
 # Local Differential Priacy
 
+## :warning: NOTE: This repo is deprecated and contains old (and mostly undocumented code) - Please see https://github.com/Samuel-Maddock/pure-LDP for an updated library that contains a large number of LPD implementations including Apple's CMS/HCMS and Google's RAPPOR for private frequency estimation :warning:
+
 An implementation of various local differential privacy (LDP) techniques mainly focusing on algorithms outlined by Apple. 
 
 The project aims to provide implementations of the most recent and practical algorithms for LDP. All algorithms will be implemented in Python 3. The project also serves as a way to compare and analyse these techniques in both performance and implementation by providing various simulations and benchmarks.
@@ -16,10 +18,7 @@ A good introduction and brief survey of recent LDP algorithms is presented [here
 
 # TODO
 - [ ] Misc: Documentation !!!
-- [ ] Separate out Apple implementations from the simulation framework into a diff repo
 - [ ] Google: Implement the RAPPOR extension
-- [ ] Google: Simulations for RAPPOR + extensions
-- [ ] Misc: Finishing the README
 
 # Resources
 1) [Algorithmic Foundations of Differential Privacy](https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf)
